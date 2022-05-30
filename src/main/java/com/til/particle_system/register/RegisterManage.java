@@ -23,9 +23,10 @@ public class RegisterManage {
         if (ANALYSIS_MAP.containsKey(eClass)){
             return (Analysis<E>)ANALYSIS_MAP.get(eClass);
         }
-        return (Analysis<E>) ANALYSIS_MAP.put(eClass, new Analysis<>(eClass));
+        Analysis<E> analysis = new Analysis<>(eClass);
+        ANALYSIS_MAP.put(eClass, analysis);
+        return analysis;
     }
-
     public <E> void put(Class<E> eClass, Analysis<E> analysis)  {
         ANALYSIS_MAP.put(eClass, analysis);
     }
