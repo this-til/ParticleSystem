@@ -9,9 +9,7 @@ import com.til.particle_system.event.EventMod;
 import com.til.particle_system.register.Analysis;
 import com.til.particle_system.register.IFromJsonElement;
 import com.til.particle_system.register.RegisterManage;
-import com.til.particle_system.util.ITime;
-import com.til.particle_system.util.IValue;
-import com.til.particle_system.util.UseString;
+import com.til.particle_system.util.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -77,10 +75,10 @@ public class MainParticleSystem {
             });
         }
         {
-            Analysis<Vec2> analysis = registerManage.get(Vec2.class);
+            Analysis<V2> analysis = registerManage.get(V2.class);
             analysis.put(new IFromJsonElement<>() {
                 @Override
-                public JsonElement from(Vec2 vec2) {
+                public JsonElement from(V2 vec2) {
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.add(UseString.X, new JsonPrimitive(vec2.x));
                     jsonObject.add(UseString.Y, new JsonPrimitive(vec2.y));
@@ -88,14 +86,14 @@ public class MainParticleSystem {
                 }
 
                 @Override
-                public Vec2 as(JsonElement jsonElement) {
-                    return new Vec2(jsonElement.getAsJsonObject().get(UseString.X).getAsFloat(),
-                            jsonElement.getAsJsonObject().get(UseString.Y).getAsFloat());
+                public V2 as(JsonElement jsonElement) {
+                    return new V2(jsonElement.getAsJsonObject().get(UseString.X).getAsDouble(),
+                            jsonElement.getAsJsonObject().get(UseString.Y).getAsDouble());
                 }
 
                 @Override
-                public Class<Vec2> getType() {
-                    return Vec2.class;
+                public Class<V2> getType() {
+                    return V2.class;
                 }
 
                 @Override
@@ -105,10 +103,10 @@ public class MainParticleSystem {
             });
         }
         {
-            Analysis<Vec3> analysis = registerManage.get(Vec3.class);
+            Analysis<V3> analysis = registerManage.get(V3.class);
             analysis.put(new IFromJsonElement<>() {
                 @Override
-                public JsonElement from(Vec3 vec2) {
+                public JsonElement from(V3 vec2) {
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.add(UseString.X, new JsonPrimitive(vec2.x));
                     jsonObject.add(UseString.Y, new JsonPrimitive(vec2.y));
@@ -117,15 +115,15 @@ public class MainParticleSystem {
                 }
 
                 @Override
-                public Vec3 as(JsonElement jsonElement) {
-                    return new Vec3(jsonElement.getAsJsonObject().get(UseString.X).getAsDouble(),
+                public V3 as(JsonElement jsonElement) {
+                    return new V3(jsonElement.getAsJsonObject().get(UseString.X).getAsDouble(),
                             jsonElement.getAsJsonObject().get(UseString.Y).getAsDouble(),
                             jsonElement.getAsJsonObject().get(UseString.Z).getAsDouble());
                 }
 
                 @Override
-                public Class<Vec3> getType() {
-                    return Vec3.class;
+                public Class<V3> getType() {
+                    return V3.class;
                 }
 
                 @Override
@@ -163,7 +161,7 @@ public class MainParticleSystem {
         }
         {
             Analysis<Boolean> analysis = registerManage.get(Boolean.class);
-            analysis.put(new IFromJsonElement<Boolean>() {
+            analysis.put(new IFromJsonElement<>() {
                 @Override
                 public JsonElement from(Boolean aBoolean) {
                     return new JsonPrimitive(aBoolean);
@@ -189,9 +187,9 @@ public class MainParticleSystem {
             Analysis<ITime.ITimeNumber> analysis = registerManage.get(ITime.ITimeNumber.class);
         }
         {
-            Analysis<ITime.ITimeVec3> analysis = registerManage.get(ITime.ITimeVec3.class);
-            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeVec3.DefaultTimeVec3.class));
-            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeVec3.NoSeparationTimeVec3.class, UseString.NO_SEPARATION));
+            Analysis<ITime.ITimeV3> analysis = registerManage.get(ITime.ITimeV3.class);
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeV3.DefaultTimeV3.class));
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeV3.NoSeparationTimeV3.class, UseString.NO_SEPARATION));
         }
         {
             Analysis<ITime.ITimeColour> analysis = registerManage.get(ITime.ITimeColour.class);
@@ -199,9 +197,9 @@ public class MainParticleSystem {
             analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeColour.NoSeparationTimeColour.class, UseString.NO_SEPARATION));
         }
         {
-            Analysis<ITime.ITimeVec2> analysis = registerManage.get(ITime.ITimeVec2.class);
-            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeVec2.DefaultTimeVec2.class));
-            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeVec2.NoSeparationTimeVec2.class, UseString.NO_SEPARATION));
+            Analysis<ITime.ITimeV2> analysis = registerManage.get(ITime.ITimeV2.class);
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeV2.DefaultTimeV2.class));
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(ITime.ITimeV2.NoSeparationTimeV2.class, UseString.NO_SEPARATION));
         }
         {
             Analysis<MainElement> analysis = registerManage.get(MainElement.class);

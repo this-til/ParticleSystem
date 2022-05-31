@@ -53,9 +53,9 @@ public interface ITime<E> {
         }
     }
 
-    interface ITimeVec3 extends ITime<Vec3> {
+    interface ITimeV3 extends ITime<V3> {
 
-        class DefaultTimeVec3 implements ITimeVec3 {
+        class DefaultTimeV3 implements ITimeV3 {
             @UseField
             public ITimeNumber x;
             @UseField
@@ -64,45 +64,45 @@ public interface ITime<E> {
             public ITimeNumber z;
 
             @Override
-            public Vec3 as(double time) {
-                return new Vec3(x.as(time).doubleValue(), y.as(time).doubleValue(), z.as(time).doubleValue());
+            public V3 as(double time) {
+                return new V3(x.as(time).doubleValue(), y.as(time).doubleValue(), z.as(time).doubleValue());
             }
 
         }
 
-        class NoSeparationTimeVec3 implements ITimeVec3 {
+        class NoSeparationTimeV3 implements ITimeV3 {
             @UseField
             public ITimeNumber value;
 
             @Override
-            public Vec3 as(double time) {
-                return new Vec3(value.as(time).doubleValue(), value.as(time).doubleValue(), value.as(time).doubleValue());
+            public V3 as(double time) {
+                return new V3(value.as(time).doubleValue(), value.as(time).doubleValue(), value.as(time).doubleValue());
             }
 
         }
     }
 
-    interface ITimeVec2 extends ITime<Vec2> {
-        class DefaultTimeVec2 implements ITimeVec2 {
+    interface ITimeV2 extends ITime<V2> {
+        class DefaultTimeV2 implements ITimeV2 {
             @UseField
             public ITimeNumber x;
             @UseField
             public ITimeNumber y;
 
             @Override
-            public Vec2 as(double time) {
-                return new Vec2(x.as(time).floatValue(), y.as(time).floatValue());
+            public V2 as(double time) {
+                return new V2(x.as(time).doubleValue(), y.as(time).doubleValue());
             }
         }
 
-        class NoSeparationTimeVec2 implements ITimeVec2 {
+        class NoSeparationTimeV2 implements ITimeV2 {
 
             @UseField
             public ITimeNumber value;
 
             @Override
-            public Vec2 as(double time) {
-                return new Vec2(value.as(time).floatValue(), value.as(time).floatValue());
+            public V2 as(double time) {
+                return new V2(value.as(time).doubleValue(), value.as(time).doubleValue());
             }
         }
     }

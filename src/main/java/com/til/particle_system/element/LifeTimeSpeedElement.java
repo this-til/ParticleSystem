@@ -12,19 +12,19 @@ public class LifeTimeSpeedElement {
      * 生命周期内的速度控制
      * -起始速度*该值
      */
-    public ITime.ITimeVec3 speed;
+    public ITime.ITimeV3 speed;
 
     /***
      * 轨道
      * 将轨道速度应用于粒子，使其围绕系统中心旋转
      */
-    public ITime.ITimeVec3 track;
+    public ITime.ITimeV3 track;
 
     /***
      * 偏移
      * 将偏移应用于旋转中心
      */
-    public ITime.ITimeVec3 deviation;
+    public ITime.ITimeV3 deviation;
 
 
 

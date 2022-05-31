@@ -40,7 +40,7 @@ public interface IValue<E> {
 
     interface IValueNumber extends IValue<Number> {
 
-        class NumberFinal implements IValueNumber, IFinalNumber {
+        class NumberFinal implements IValueNumber {
             @UseField
             public Number value;
 

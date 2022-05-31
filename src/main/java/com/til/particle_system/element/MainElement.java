@@ -38,19 +38,19 @@ public class MainElement extends Element {
      * 起始速度
      */
     @UseField
-    public ITime.ITimeVec3 particleSpeed;
+    public ITime.ITimeV3 particleSpeed;
 
     /***
      *  起始大小
      */
     @UseField
-    public ITime.ITimeVec3 particleSize;
+    public ITime.ITimeV3 particleSize;
 
     /***
      * 起始旋转
      */
     @UseField
-    public ITime.ITimeVec3 particleRotate;
+    public ITime.ITimeV3 particleRotate;
 
     /***
      * 起始颜色

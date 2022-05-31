@@ -12,6 +12,6 @@ public class LifeTimeSizeElement {
      * 大小
      * -起始大小*该值
      */
-    public ITime.ITimeVec3 size;
+    public ITime.ITimeV3 size;
 
 }

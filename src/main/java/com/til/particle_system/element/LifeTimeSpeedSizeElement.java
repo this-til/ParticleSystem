@@ -14,7 +14,7 @@ public class LifeTimeSpeedSizeElement {
      * -根据速度范围计算time
      * -粒子大小*改值
      */
-    public ITime.ITimeVec3 size;
+    public ITime.ITimeV3 size;
 
     /***
      * 速度范围
