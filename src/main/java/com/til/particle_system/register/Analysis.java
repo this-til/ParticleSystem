@@ -27,9 +27,6 @@ public class Analysis<E> {
     public <EE extends E> void put(IFromJsonElement<EE> iFromJsonElement) {
         classIAnalysisElementMap.put(iFromJsonElement.getType(), Util.forcedVonversion(iFromJsonElement));
         stringClassMap.put(iFromJsonElement.getTypeName(), iFromJsonElement.getType());
-        if (!MainParticleSystem.main.registerManage.ANALYSIS_MAP.containsKey(iFromJsonElement.getType())) {
-            MainParticleSystem.main.registerManage.get(iFromJsonElement.getType()).put(iFromJsonElement);
-        }
     }
 
     public IFromJsonElement<E> get(Class<?> eClass) {

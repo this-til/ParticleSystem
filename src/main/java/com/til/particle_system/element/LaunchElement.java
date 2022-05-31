@@ -9,7 +9,7 @@ import com.til.particle_system.util.*;
  *
  * @author til
  */
-public class LaunchElement extends Element {
+public class LaunchElement implements IElement {
 
     /***
      * 随时间生成粒子数

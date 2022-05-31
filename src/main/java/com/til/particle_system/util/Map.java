@@ -66,7 +66,7 @@ public class Map<K, V> extends HashMap<K, V> {
         }
     }
 
-    public void put(Extension.Data_2<K, V> data_2) {
+    public void put(Extension.Data2<K, V> data_2) {
         put(data_2.d1, data_2.d2);
     }
 
@@ -75,10 +75,10 @@ public class Map<K, V> extends HashMap<K, V> {
         return this;
     }
 
-    public <KO, VO> Map<KO, VO> to(Extension.Func_2I<K, V, Extension.Data_2<KO, VO>> func2I) {
+    public <KO, VO> Map<KO, VO> to(Extension.Func2I<K, V, Extension.Data2<KO, VO>> func2I) {
         Map<KO, VO> d = new Map<>();
         for (Entry<K, V> kvEntry : this.entrySet()) {
-            Extension.Data_2<KO, VO> data_2 = func2I.func(kvEntry.getKey(), kvEntry.getValue());
+            Extension.Data2<KO, VO> data_2 = func2I.func(kvEntry.getKey(), kvEntry.getValue());
             if (data_2 != null && data_2.d1 != null && data_2.d2 != null) {
                 d.put(data_2);
             }

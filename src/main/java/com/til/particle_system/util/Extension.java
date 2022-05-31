@@ -7,32 +7,33 @@ public class Extension {
 
     public interface Action {
 
-        Action empty = () -> {};
+        Action empty = () -> {
+        };
 
         void action();
     }
 
-    public interface Action_1V<A> {
+    public interface Action1V<A> {
         void action(A a);
     }
 
-    public interface Action_2V<A, B> {
+    public interface Action2V<A, B> {
         void action(A a, B b);
     }
 
-    public interface Action_3V<A, B, C> {
+    public interface Action3V<A, B, C> {
         void action(A a, B b, C c);
     }
 
-    public interface Action_4V<A, B, C, D> {
+    public interface Action4V<A, B, C, D> {
         void action(A a, B b, C c, D d);
     }
 
-    public interface Action_5V<A, B, C, D, E> {
+    public interface Action5V<A, B, C, D, E> {
         void action(A a, B b, C c, D d, E e);
     }
 
-    public interface Action_6V<A, B, C, D, E, F> {
+    public interface Action6V<A, B, C, D, E, F> {
         void action(A a, B b, C c, D d, E e, F f);
     }
 
@@ -40,11 +41,11 @@ public class Extension {
         O func();
     }
 
-    public interface Func_1I<I, O> {
+    public interface Func1I<I, O> {
         O func(I i);
     }
 
-    public interface Func_2I<I1, I2, O> {
+    public interface Func2I<I1, I2, O> {
         O func(I1 i1, I2 i2);
     }
 
@@ -56,13 +57,26 @@ public class Extension {
         }
     }
 
-    public static class Data_2<D1, D2> {
+    public static class Data2<D1, D2> {
         D1 d1;
         D2 d2;
 
-        public Data_2(D1 d1, D2 d2) {
+        public Data2(D1 d1, D2 d2) {
             this.d1 = d1;
             this.d2 = d2;
+        }
+    }
+
+
+    public static class Data3<D1, D2, D3> {
+        D1 d1;
+        D2 d2;
+        D3 d3;
+
+        public Data3(D1 d1, D2 d2, D3 d3) {
+            this.d1 = d1;
+            this.d2 = d2;
+            this.d3 = d3;
         }
     }
 

@@ -1,11 +1,8 @@
 package com.til.particle_system.register;
 
 
-import com.til.particle_system.MainParticleSystem;
+import com.til.particle_system.util.List;
 import com.til.particle_system.util.Map;
-import net.minecraft.resources.ResourceLocation;
-
-import java.text.MessageFormat;
 
 /**
  * @author til
@@ -13,6 +10,7 @@ import java.text.MessageFormat;
 public class RegisterManage {
 
     public final Map<Class<?>, Analysis<?>> ANALYSIS_MAP = new Map<>();
+    public final Map<Class<?>, List<Class<?>>> INTERCEPT = new Map<>();
 
     public boolean has(Class<?> key) {
         return ANALYSIS_MAP.containsKey(key);
@@ -20,15 +18,23 @@ public class RegisterManage {
 
     @SuppressWarnings("unchecked")
     public <E> Analysis<E> put(Class<E> eClass) {
-        if (ANALYSIS_MAP.containsKey(eClass)){
-            return (Analysis<E>)ANALYSIS_MAP.get(eClass);
+        if (ANALYSIS_MAP.containsKey(eClass)) {
+            return (Analysis<E>) ANALYSIS_MAP.get(eClass);
         }
         Analysis<E> analysis = new Analysis<>(eClass);
         ANALYSIS_MAP.put(eClass, analysis);
+        INTERCEPT.forEach((k, v) -> {
+            if (k.isAssignableFrom(eClass)) {
+                v.add(eClass);
+            }
+        });
         return analysis;
     }
-    public <E> void put(Class<E> eClass, Analysis<E> analysis)  {
-        ANALYSIS_MAP.put(eClass, analysis);
+
+    public void addIntercept(Class<?> c) {
+        if (!INTERCEPT.containsKey(c)) {
+            INTERCEPT.put(c, new List<>());
+        }
     }
 
     /***

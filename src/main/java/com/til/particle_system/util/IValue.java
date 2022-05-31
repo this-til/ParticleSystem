@@ -1,12 +1,6 @@
 package com.til.particle_system.util;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.til.particle_system.element.use_field.UseField;
-import com.til.particle_system.event.EventMod;
-import com.til.particle_system.register.IFromJsonElement;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.Random;
 
@@ -60,7 +54,9 @@ public interface IValue<E> {
 
             @Override
             public Number as() {
-                return random.nextDouble(min.as().doubleValue(), max.as().doubleValue());
+                double d1 = max.as().doubleValue();
+                double d2 = min.as().doubleValue();
+                return random.nextDouble(Math.min(d1, d2), Math.max(d1, d2));
             }
         }
 

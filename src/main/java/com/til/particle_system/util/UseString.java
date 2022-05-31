@@ -22,4 +22,5 @@ public class UseString {
     public static final String G = "g";
     public static final String B = "b";
     public static final String A = "a";
+    public static final String W = "w";
 }

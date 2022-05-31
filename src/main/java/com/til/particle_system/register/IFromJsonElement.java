@@ -23,7 +23,9 @@ public interface IFromJsonElement<E> {
 
     Class<E> getType();
 
-    String getTypeName();
+    default String getTypeName() {
+        return UseString.DEFAULT;
+    }
 
     class CurrencyFromJsonElement<E> implements IFromJsonElement<E> {
 

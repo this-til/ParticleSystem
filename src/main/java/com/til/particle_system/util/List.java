@@ -25,7 +25,7 @@ public class List<E> extends ArrayList<E> {
         }
     }
 
-    public <O> List<O> to(Extension.Func_1I<E, O> func_1I) {
+    public <O> List<O> to(Extension.Func1I<E, O> func_1I) {
         List<O> list = new List<O>();
         for (E e : this) {
             O o = func_1I.func(e);

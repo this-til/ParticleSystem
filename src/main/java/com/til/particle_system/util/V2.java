@@ -16,4 +16,21 @@ public class V2 {
         this.x = x;
         this.y = y;
     }
+
+    public double getProportion(double d) {
+        return getProportionStatic(x, y, d);
+    }
+
+    public static double getProportionStatic(double a, double b, double d) {
+        double max = Math.max(a, b);
+        double min = Math.min(a, b);
+        if (d < min) {
+            return 0;
+        }
+        if (d > max) {
+            return 1;
+        }
+        return (d - min) / max;
+    }
+
 }

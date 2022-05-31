@@ -107,7 +107,7 @@ public interface ITime<E> {
         }
     }
 
-    interface ITimeColour extends ITime<Color> {
+    interface ITimeColour extends ITime<Colour> {
 
         class DefaultTimeColour implements ITimeColour {
 
@@ -121,8 +121,8 @@ public interface ITime<E> {
             public ITimeNumber a;
 
             @Override
-            public Color as(double time) {
-                return new Color(r.as(time).intValue(), g.as(time).intValue(), b.as(time).intValue(), a.as(time).intValue());
+            public Colour as(double time) {
+                return new Colour(r.as(time).doubleValue(), g.as(time).doubleValue(), b.as(time).doubleValue(), a.as(time).doubleValue());
             }
 
         }
@@ -132,8 +132,8 @@ public interface ITime<E> {
             public ITimeNumber value;
 
             @Override
-            public Color as(double time) {
-                return new Color(value.as(time).intValue(), value.as(time).intValue(), value.as(time).intValue(), value.as(time).intValue());
+            public Colour as(double time) {
+                return new Colour(value.as(time).doubleValue(), value.as(time).doubleValue(), value.as(time).doubleValue(), value.as(time).doubleValue());
             }
 
         }

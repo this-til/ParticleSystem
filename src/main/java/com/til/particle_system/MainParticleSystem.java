@@ -5,14 +5,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.logging.LogUtils;
 import com.til.particle_system.element.*;
+import com.til.particle_system.element.main.ParticleSystem;
 import com.til.particle_system.event.EventMod;
 import com.til.particle_system.register.Analysis;
 import com.til.particle_system.register.IFromJsonElement;
 import com.til.particle_system.register.RegisterManage;
 import com.til.particle_system.util.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -49,7 +48,10 @@ public class MainParticleSystem {
     private void setup(final FMLCommonSetupEvent event) {
         LOGGER.info("开始注册标签解析类型");
         MinecraftForge.EVENT_BUS.start();
-
+        {
+            registerManage.addIntercept(IElement.class);
+            registerManage.addIntercept(IElement.IParticleElement.class);
+        }
         {
             Analysis<Number> analysis = registerManage.get(Number.class);
             analysis.put(new IFromJsonElement<>() {
@@ -68,10 +70,26 @@ public class MainParticleSystem {
                     return Number.class;
                 }
 
+            });
+        }
+        {
+            Analysis<Boolean> analysis = registerManage.get(Boolean.class);
+            analysis.put(new IFromJsonElement<>() {
                 @Override
-                public String getTypeName() {
-                    return UseString.DEFAULT;
+                public JsonElement from(Boolean aBoolean) {
+                    return new JsonPrimitive(aBoolean);
                 }
+
+                @Override
+                public Boolean as(JsonElement jsonElement) {
+                    return jsonElement.getAsBoolean();
+                }
+
+                @Override
+                public Class<Boolean> getType() {
+                    return Boolean.class;
+                }
+
             });
         }
         {
@@ -96,10 +114,6 @@ public class MainParticleSystem {
                     return V2.class;
                 }
 
-                @Override
-                public String getTypeName() {
-                    return UseString.DEFAULT;
-                }
             });
         }
         {
@@ -126,10 +140,64 @@ public class MainParticleSystem {
                     return V3.class;
                 }
 
+            });
+        }
+        {
+            Analysis<Quaternion> analysis = registerManage.get(Quaternion.class);
+            analysis.put(new IFromJsonElement<>() {
                 @Override
-                public String getTypeName() {
-                    return UseString.DEFAULT;
+                public JsonElement from(Quaternion quaternion) {
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.add(UseString.W, new JsonPrimitive(quaternion.w));
+                    jsonObject.add(UseString.X, new JsonPrimitive(quaternion.x));
+                    jsonObject.add(UseString.Y, new JsonPrimitive(quaternion.y));
+                    jsonObject.add(UseString.Z, new JsonPrimitive(quaternion.z));
+                    return jsonObject;
                 }
+
+                @Override
+                public Quaternion as(JsonElement jsonElement) {
+                    return new Quaternion(
+                            jsonElement.getAsJsonObject().get(UseString.W).getAsDouble(),
+                            jsonElement.getAsJsonObject().get(UseString.X).getAsDouble(),
+                            jsonElement.getAsJsonObject().get(UseString.Y).getAsDouble(),
+                            jsonElement.getAsJsonObject().get(UseString.Z).getAsDouble());
+                }
+
+                @Override
+                public Class<Quaternion> getType() {
+                    return Quaternion.class;
+                }
+
+            });
+        }
+        {
+            Analysis<Colour> analysis = registerManage.get(Colour.class);
+            analysis.put(new IFromJsonElement<>() {
+                @Override
+                public JsonElement from(Colour colour) {
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.add(UseString.R, new JsonPrimitive(colour.r));
+                    jsonObject.add(UseString.G, new JsonPrimitive(colour.g));
+                    jsonObject.add(UseString.B, new JsonPrimitive(colour.b));
+                    jsonObject.add(UseString.A, new JsonPrimitive(colour.a));
+                    return jsonObject;
+                }
+
+                @Override
+                public Colour as(JsonElement jsonElement) {
+                    return new Colour(
+                            jsonElement.getAsJsonObject().get(UseString.R).getAsDouble(),
+                            jsonElement.getAsJsonObject().get(UseString.G).getAsDouble(),
+                            jsonElement.getAsJsonObject().get(UseString.B).getAsDouble(),
+                            jsonElement.getAsJsonObject().get(UseString.A).getAsDouble());
+                }
+
+                @Override
+                public Class<Colour> getType() {
+                    return Colour.class;
+                }
+
             });
         }
         {
@@ -158,30 +226,6 @@ public class MainParticleSystem {
                 }
             });
             analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(IValue.IValueNumber.NumberRandom.class, UseString.RANDOM));
-        }
-        {
-            Analysis<Boolean> analysis = registerManage.get(Boolean.class);
-            analysis.put(new IFromJsonElement<>() {
-                @Override
-                public JsonElement from(Boolean aBoolean) {
-                    return new JsonPrimitive(aBoolean);
-                }
-
-                @Override
-                public Boolean as(JsonElement jsonElement) {
-                    return jsonElement.getAsBoolean();
-                }
-
-                @Override
-                public Class<Boolean> getType() {
-                    return Boolean.class;
-                }
-
-                @Override
-                public String getTypeName() {
-                    return UseString.DEFAULT;
-                }
-            });
         }
         {
             Analysis<ITime.ITimeNumber> analysis = registerManage.get(ITime.ITimeNumber.class);
@@ -245,6 +289,53 @@ public class MainParticleSystem {
             Analysis<LifeTimeSpeedSizeElement> analysis = registerManage.get(LifeTimeSpeedSizeElement.class);
             analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(LifeTimeSpeedSizeElement.class));
         }
+        {
+            Analysis<LifeTimeSpeedLimitElement> analysis = registerManage.get(LifeTimeSpeedLimitElement.class);
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(LifeTimeSpeedLimitElement.class));
+        }
+        {
+            Analysis<LifeTimeRotateElement> analysis = registerManage.get(LifeTimeRotateElement.class);
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(LifeTimeRotateElement.class));
+        }
+        {
+            Analysis<LifeTimeSpeedRotateElement> analysis = registerManage.get(LifeTimeSpeedRotateElement.class);
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(LifeTimeSpeedRotateElement.class));
+        }
+        {
+            Analysis<StartSpeedLifeElement> analysis = registerManage.get(StartSpeedLifeElement.class);
+            analysis.put(new IFromJsonElement.CurrencyFromJsonElement<>(StartSpeedLifeElement.class));
+        }
+
+        {
+            Analysis<ParticleSystem> analysis = registerManage.get(ParticleSystem.class);
+            analysis.put(new IFromJsonElement<>() {
+                @Override
+                public JsonElement from(ParticleSystem particleSystem) {
+                    JsonObject jsonObject = new JsonObject();
+                    particleSystem.map.forEach((k, v) -> {
+                        jsonObject.add(Util.titleCase(k.getName()), registerManage.get(k).from(v));
+                    });
+                    return jsonObject;
+                }
+
+                @Override
+                public ParticleSystem as(JsonElement jsonElement) {
+                    ParticleSystem particleSystem = new ParticleSystem();
+                    registerManage.INTERCEPT.get(IElement.class).forEach(e -> {
+                        String k = Util.titleCase(e.getName());
+                        if (jsonElement.getAsJsonObject().has(k)) {
+                            particleSystem.map.put(Util.forcedVonversion(e), Util.forcedVonversion(registerManage.get(e).as(jsonElement.getAsJsonObject().get(k))));
+                        }
+                    });
+                    return particleSystem;
+                }
+
+                @Override
+                public Class<ParticleSystem> getType() {
+                    return ParticleSystem.class;
+                }
+            });
+        }
 
         MinecraftForge.EVENT_BUS.post(new EventMod.Init.Register.Type());
 
@@ -257,6 +348,7 @@ public class MainParticleSystem {
 
         MinecraftForge.EVENT_BUS.post(new EventMod.Init.Register.Element());
         //LOGGER.info("开始扫描XML文档");
+
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event) {

@@ -1,20 +1,24 @@
 package com.til.particle_system.element;
 
+import com.til.particle_system.element.main.ParticleCell;
+import com.til.particle_system.element.main.ParticleSystemCell;
 import com.til.particle_system.element.use_field.UseField;
 import com.til.particle_system.util.ITime;
 import com.til.particle_system.util.IValue;
+import com.til.particle_system.util.Quaternion;
+import com.til.particle_system.util.V3;
 
 /**
  * 用于储存粒子系统的主要元素
  *
  * @author til
  */
-public class MainElement extends Element {
+public class MainElement implements IElement {
     /***
      * int 粒子系统的生命周期
      */
     @UseField
-    public Number time;
+    public Number maxLife;
 
     /***
      * 粒子系统是否开始循环
@@ -89,12 +93,36 @@ public class MainElement extends Element {
         /***
          * 世界坐标系
          */
-        WORLD,
+        WORLD {
+            @Override
+            public void move(ParticleSystemCell particleSystemCell, ParticleCell particleCell, V3 mainMove) {
+                particleCell.pos = particleCell.pos.reduce(mainMove);
+            }
+
+            @Override
+            public void rotate(ParticleSystemCell particleSystemCell, ParticleCell particleCell, Quaternion mainRotate) {
+                particleCell.startRotateMove = particleCell.startRotateMove.multiply(mainRotate.inverse());
+            }
+        },
         /***
-         * 实体坐标系
-         * 为粒子使用实体坐标*本身坐标
+         * 局部坐标系
          */
-        ENTITY;
+        ENTITY {
+            @Override
+            public void move(ParticleSystemCell particleSystemCell, ParticleCell particleCell, V3 mainMove) {
+
+            }
+
+            @Override
+            public void rotate(ParticleSystemCell particleSystemCell, ParticleCell particleCell, Quaternion mainRotate) {
+
+            }
+        };
+
+        public abstract void move(ParticleSystemCell particleSystemCell, ParticleCell particleCell, V3 mainMove);
+
+        public abstract void rotate(ParticleSystemCell particleSystemCell, ParticleCell particleCell, Quaternion mainRotate);
+
     }
 
     public enum ParticleBufferMode {
