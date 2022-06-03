@@ -1,13 +1,16 @@
-package com.til.particle_system.element.main;
+package com.til.particle_system.element.cell;
 
 
+import com.til.json_read_write.util.List;
+import com.til.json_read_write.util.math.Quaternion;
+import com.til.json_read_write.util.math.V3;
 import com.til.particle_system.MainParticleSystem;
 import com.til.particle_system.element.IElement;
-import com.til.particle_system.element.MainElement;
-import com.til.particle_system.util.List;
-import com.til.particle_system.util.Quaternion;
-import com.til.particle_system.util.Util;
-import com.til.particle_system.util.V3;
+import com.til.particle_system.element.main.MainElement;
+import com.til.particle_system.element.ParticleSystem;
+import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
+import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
+import com.til.particle_system.util.ParticleSystemUtil;
 
 /***
  * 一个粒子系统的元素
@@ -75,11 +78,10 @@ public class ParticleSystemCell {
         this.pos = pos;
         this.rotate = rotate;
         this.size = size;
-        MainElement mainElement = particleSystem.get(MainElement.class);
-        maxParticle = mainElement.maxParticle.intValue();
+        maxParticle = particleSystem.mainElement.maxParticle;
         particleCells = new List<>(maxParticle);
-        maxLife = mainElement.maxLife.intValue();
-        loop = mainElement.loop;
+        maxLife = particleSystem.mainElement.maxLife;
+        loop = particleSystem.mainElement.loop;
     }
 
     /***
@@ -87,37 +89,13 @@ public class ParticleSystemCell {
      */
     public void newLoop() {
         life = 0;
-        delay = particleSystem.get(MainElement.class).delay.as().intValue();
+        delay = particleSystem.mainElement.delay.as().intValue();
     }
 
     /***
      * 毎t刷新
      */
     public void up() {
-        MainElement mainElement = particleSystem.get(MainElement.class);
-        life++;
-        if (life > maxLife){
-
-        }
-        MainParticleSystem.main.registerManage.INTERCEPT.get(IElement.IParticleElement.class).forEach(c -> {
-            if (particleSystem.map.containsKey(c)) {
-                particleCells.forEach(e -> {
-                    particleSystem.get(Util.<Class<IElement.IParticleElement>>forcedVonversion(c)).up(e);
-                });
-            }
-        });
-        List<ParticleCell> endParticleCell = null;
-        for (ParticleCell particleCell : particleCells) {
-            if (particleCell.isDeath) {
-                if (endParticleCell == null) {
-                    endParticleCell = new List<>();
-                }
-                endParticleCell.add(particleCell);
-            }
-        }
-        if (endParticleCell != null) {
-            particleCells.remove(endParticleCell);
-        }
 
     }
 
@@ -127,7 +105,7 @@ public class ParticleSystemCell {
      */
     public void move(V3 m) {
         pos = pos.add(m);
-        MainElement mainElement = particleSystem.get(MainElement.class);
+        MainElement mainElement = particleSystem.mainElement;
         particleCells.forEach(cell -> mainElement.worldCoordinate.move(this, cell, m));
     }
 
@@ -137,10 +115,14 @@ public class ParticleSystemCell {
      */
     public void rotate(Quaternion r) {
         rotate = rotate.multiply(r);
-        MainElement mainElement = particleSystem.get(MainElement.class);
+        MainElement mainElement = particleSystem.mainElement;
         particleCells.forEach(cell -> mainElement.worldCoordinate.rotate(this, cell, r));
     }
 
+    /***
+     * 设置粒子系统大小
+     * @param size 大小
+     */
     public void setSize(V3 size) {
         this.size = size;
     }

@@ -1,7 +1,6 @@
 package com.til.particle_system.element;
 
-import com.til.particle_system.element.main.ParticleCell;
-import com.til.particle_system.element.main.ParticleSystemCell;
+import com.til.particle_system.element.cell.ParticleCell;
 
 /***
  * @author til
@@ -9,7 +8,6 @@ import com.til.particle_system.element.main.ParticleSystemCell;
 public interface IElement {
 
     interface IParticleElement extends IElement {
-        void up(ParticleCell particleCell);
     }
 
 }

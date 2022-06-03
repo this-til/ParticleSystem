@@ -1,94 +1,102 @@
-package com.til.particle_system.element;
+package com.til.particle_system.element.main;
 
-import com.til.particle_system.element.main.ParticleCell;
-import com.til.particle_system.element.main.ParticleSystemCell;
-import com.til.particle_system.element.use_field.UseField;
-import com.til.particle_system.util.ITime;
-import com.til.particle_system.util.IValue;
-import com.til.particle_system.util.Quaternion;
-import com.til.particle_system.util.V3;
+import com.til.json_read_write.annotation.BaseClass;
+import com.til.json_read_write.annotation.JsonField;
+import com.til.json_read_write.annotation.SonClass;
+import com.til.json_read_write.api.JsonTransform;
+import com.til.json_read_write.util.math.ITime;
+import com.til.json_read_write.util.math.IValue;
+import com.til.json_read_write.util.math.Quaternion;
+import com.til.json_read_write.util.math.V3;
+import com.til.particle_system.element.IElement;
+import com.til.particle_system.element.cell.ParticleCell;
+import com.til.particle_system.element.cell.ParticleSystemCell;
 
 /**
  * 用于储存粒子系统的主要元素
  *
  * @author til
  */
+@BaseClass(sonClass = MainElement.class)
+@SonClass()
 public class MainElement implements IElement {
     /***
      * int 粒子系统的生命周期
      */
-    @UseField
-    public Number maxLife;
+    @JsonField
+    public int maxLife;
 
     /***
      * 粒子系统是否开始循环
      */
-    @UseField
-    public Boolean loop;
+    @JsonField
+    public boolean loop;
 
     /***
      * 粒子系统的启动延迟
      */
-    @UseField
+    @JsonField
     public IValue.IValueNumber delay;
 
     /***
      * 起始生命周期
      */
-    @UseField
+    @JsonField
     public ITime.ITimeNumber particleLife;
 
     /***
      * 起始速度
      */
-    @UseField
-    public ITime.ITimeV3 particleSpeed;
+    @JsonField
+    public ITime.ITimeNumber particleSpeed;
 
     /***
      *  起始大小
      */
-    @UseField
+    @JsonField
     public ITime.ITimeV3 particleSize;
 
     /***
      * 起始旋转
      */
-    @UseField
+    @JsonField
     public ITime.ITimeV3 particleRotate;
 
     /***
      * 起始颜色
      */
-    @UseField
+    @JsonField
     public ITime.ITimeColour particleColour;
 
     /***
      * 粒子重力
      */
-    @UseField
+    @JsonField
     public ITime.ITimeNumber particleGravity;
 
     /***
      * 粒子坐标系
      */
-    @UseField
+    @JsonField
     public ParticleCoordinate worldCoordinate;
 
     /***
      * 获取最大粒子数（int）
      */
-    @UseField
-    public Number maxParticle;
+    @JsonField
+    public int maxParticle;
 
     /***
      * 粒子的缓存模式
      */
-    @UseField
+    @JsonField
     public ParticleBufferMode bufferMode;
 
     /***
      * 粒子坐标系
      */
+    @BaseClass(sonClass = ParticleCoordinate.class)
+    @SonClass(transform = JsonTransform.EnumCurrencyJsonTransform.class)
     public enum ParticleCoordinate {
         /***
          * 世界坐标系
@@ -101,7 +109,7 @@ public class MainElement implements IElement {
 
             @Override
             public void rotate(ParticleSystemCell particleSystemCell, ParticleCell particleCell, Quaternion mainRotate) {
-                particleCell.startRotateMove = particleCell.startRotateMove.multiply(mainRotate.inverse());
+                particleCell.rotate = particleCell.rotate.multiply(mainRotate.inverse());
             }
         },
         /***
@@ -125,6 +133,8 @@ public class MainElement implements IElement {
 
     }
 
+    @BaseClass(sonClass = ParticleBufferMode.class)
+    @SonClass(transform = JsonTransform.EnumCurrencyJsonTransform.class)
     public enum ParticleBufferMode {
         /***
          * 杀死先生成的粒子
@@ -135,9 +145,9 @@ public class MainElement implements IElement {
          */
         SUSPEND,
         /***
-         * 忽略生成，知道有位置空出
+         * 忽略生成，直到有位置空出
          */
-        IGNORE;
+        IGNORE
     }
 
 

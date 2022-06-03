@@ -3,7 +3,7 @@ package com.til.particle_system.util;
 /***
  * @author til
  */
-public class Util {
+public class ParticleSystemUtil {
 
     /***
      * 强行转换
