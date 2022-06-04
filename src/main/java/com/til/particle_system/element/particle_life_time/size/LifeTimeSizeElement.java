@@ -3,9 +3,8 @@ package com.til.particle_system.element.particle_life_time.size;
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
-import com.til.json_read_write.util.math.ITime;
+import com.til.math.ITime;
 import com.til.particle_system.element.IElement;
-import com.til.particle_system.element.cell.ParticleCell;
 
 /***
  * 生命周期大小

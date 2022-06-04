@@ -3,11 +3,10 @@ package com.til.particle_system.element.particle_life_time.colour;
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
-import com.til.json_read_write.util.math.ITime;
-import com.til.json_read_write.util.math.V2;
+import com.til.math.ITime;
+import com.til.math.V2;
 import com.til.particle_system.element.IElement;
 import com.til.particle_system.element.particle_life_time.size.LifeTimeSizeElement;
-import com.til.particle_system.element.cell.ParticleCell;
 
 /***
  * 速度颜色

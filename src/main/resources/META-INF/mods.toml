@@ -56,9 +56,9 @@ mandatory = true
 versionRange = "[1.18.2,1.19)"
 ordering = "NONE"
 side = "BOTH"
-[[dependencies.examplemod]]
-modId="json_read_write"
-mandatory = true
-versionRange = "[1.0,2.0)"
-ordering = "NONE"
-side = "BOTH"
+# [[dependencies.examplemod]]
+# modId="json_read_write"
+# mandatory = true
+# versionRange = "[1.0,2.0)"
+# ordering = "NONE"
+# side = "BOTH"

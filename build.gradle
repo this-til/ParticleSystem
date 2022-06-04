@@ -7,7 +7,10 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         //classpath 'com.github.this-til:JsonReadWrite:1.18.2'
+        //compile files('libs/json_read_write-1.0.jar')
+        //files('libs/json_read_write-1.0.jar')
     }
+
 }
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 plugins {
@@ -146,6 +149,10 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+    flatDir {
+        dir 'libs'
+    }
+
 }
 
 dependencies {
@@ -161,6 +168,7 @@ dependencies {
 
     // Examples using mod jars from ./libs
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
+    // implementation fg.deobf("blank:json_read_write:1.18.2:1.0")
 
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

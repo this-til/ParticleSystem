@@ -3,10 +3,10 @@ package com.til.particle_system.element.main;
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
-import com.til.json_read_write.api.JsonTransform;
-import com.til.json_read_write.util.List;
-import com.til.json_read_write.util.math.ITime;
-import com.til.json_read_write.util.math.IValue;
+import com.til.json_read_write.JsonTransform;
+import com.til.util.List;
+import com.til.math.ITime;
+import com.til.math.IValue;
 import com.til.particle_system.element.IElement;
 
 /**

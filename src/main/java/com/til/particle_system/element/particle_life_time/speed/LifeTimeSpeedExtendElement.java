@@ -3,8 +3,8 @@ package com.til.particle_system.element.particle_life_time.speed;
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
-import com.til.json_read_write.api.JsonTransform;
-import com.til.json_read_write.util.math.ITime;
+import com.til.json_read_write.JsonTransform;
+import com.til.math.ITime;
 import com.til.particle_system.element.IElement;
 
 /***

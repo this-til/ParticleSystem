@@ -1,16 +1,12 @@
 package com.til.particle_system.element.cell;
 
 
-import com.til.json_read_write.util.List;
-import com.til.json_read_write.util.math.Quaternion;
-import com.til.json_read_write.util.math.V3;
-import com.til.particle_system.MainParticleSystem;
-import com.til.particle_system.element.IElement;
+import com.til.math.V2;
+import com.til.util.List;
+import com.til.math.Quaternion;
+import com.til.math.V3;
 import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.ParticleSystem;
-import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
-import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
-import com.til.particle_system.util.ParticleSystemUtil;
 
 /***
  * 一个粒子系统的元素
@@ -37,11 +33,15 @@ public class ParticleSystemCell {
      * 最大生命
      */
     public final int maxLife;
+    /***
+     * 相对于maxLife和life的时间
+     */
+    public double time;
 
     /***
      * 开启循环
      */
-    public final boolean loop;
+    public final boolean isLoop;
 
     /***
      * 当前粒子系统的坐标
@@ -72,6 +72,10 @@ public class ParticleSystemCell {
      * 系统死亡
      */
     public boolean isDeath;
+    /***
+     * 发射粒子数量
+     */
+    public double launchParticleAmount;
 
     public ParticleSystemCell(ParticleSystem particleSystem, V3 pos, Quaternion rotate, V3 size) {
         this.particleSystem = particleSystem;
@@ -81,7 +85,7 @@ public class ParticleSystemCell {
         maxParticle = particleSystem.mainElement.maxParticle;
         particleCells = new List<>(maxParticle);
         maxLife = particleSystem.mainElement.maxLife;
-        loop = particleSystem.mainElement.loop;
+        isLoop = particleSystem.mainElement.loop;
     }
 
     /***
@@ -96,7 +100,60 @@ public class ParticleSystemCell {
      * 毎t刷新
      */
     public void up() {
+        {
+            time = V2.getProportionStatic(0, maxLife, life);
+            if (delay-- > 0) {
+                return;
+            }
+            life++;
+            if (life > maxLife) {
+                if (isLoop) {
+                    newLoop();
+                } else {
+                    setDeath();
+                }
+            }
+        }
+        {
+            launchParticleAmount += particleSystem.launchElement.timeGenerate.as(time).doubleValue();
+            for (; launchParticleAmount > 0; launchParticleAmount--) {
+                launch();
+            }
+        }
+        upParticle();
+    }
 
+
+    /***
+     * 刷新粒子
+     */
+    protected void upParticle() {
+        particleCells.remove(e -> {
+            e.up();
+            return e.isDeath;
+        });
+    }
+
+    /***
+     * 发射粒子
+     */
+    public void launch() {
+        if (particleCells.size() <= maxParticle) {
+            particleCells.add(new ParticleCell(this, time));
+        } else {
+            if (particleSystem.mainElement.bufferMode == MainElement.ParticleBufferMode.KILL) {
+                particleCells.remove(particleCells.get(0));
+                launch();
+            }
+        }
+    }
+
+    /***
+     * 设置死亡
+     * 无论粒子是不是循环都杀死
+     */
+    public void setDeath() {
+        isDeath = true;
     }
 
     /***

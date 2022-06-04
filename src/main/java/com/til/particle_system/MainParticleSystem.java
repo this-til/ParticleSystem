@@ -1,6 +1,9 @@
 package com.til.particle_system;
 
+import com.google.gson.Gson;
 import com.mojang.logging.LogUtils;
+import com.til.json_read_write.JsonAnalysis;
+import com.til.particle_system.element.ParticleSystem;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -13,6 +16,8 @@ import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
+import javax.json.Json;
+
 /***
  * @author til
  */
@@ -21,24 +26,35 @@ public class MainParticleSystem {
 
     public static final String MOD_ID = "particle_system";
     public static final String MOD_NAME = "ParticleSystem";
-    public static final Logger LOGGER = LogUtils.getLogger();
+    public final Logger logger;
+    public final JsonAnalysis jsonAnalysis;
+    public final Gson gson;
     public static MainParticleSystem main;
 
     public MainParticleSystem() {
         main = this;
+        this.gson = new Gson();
+        this.logger = LogUtils.getLogger();
+        this.jsonAnalysis = new JsonAnalysis();
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         MinecraftForge.EVENT_BUS.register(this);
+        {
+            logger.debug("吃个狐狸！");
+            logger.debug("rua个华乐！");
+            logger.debug("来份志豪！");
+        }
+
     }
 
 
     private void setup(final FMLCommonSetupEvent event) {
-
-
+        jsonAnalysis.readIO.add(MOD_ID, ParticleSystem.class);
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event) {
+
     }
 
     private void processIMC(final InterModProcessEvent event) {
@@ -47,18 +63,12 @@ public class MainParticleSystem {
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        LOGGER.info("HELLO from server starting");
     }
 
-    // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
-    // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    //@Mod.EventBusSubscriber(modid = MainParticleSystem.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class RegistryEvents {
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // Register a new block here
-            LOGGER.info("HELLO from Register Block");
         }
     }
 }
