@@ -20,27 +20,14 @@ public class LifeTimeSpeedLimitElement implements IElement.IParticleElement {
      * 速度超过部分进行抑制操作
      */
     @JsonField
-    public ITime.ITimeNumber speedThreshold;
+    public ITime.ITimeV3 speedThreshold;
 
     /***
      * 抑制（0~1）之间
      * 例如0.5将超过阈值速度的超过部分减去50%
      */
     @JsonField
-    public ITime.ITimeNumber threshold;
+    public ITime.ITimeV3 threshold;
 
-    /***
-     * 乘以大小
-     * 计算阈值速度时将原速度乘粒子大小作为输出
-     */
-    @JsonField
-    public Boolean multiplySize;
-
-    /***
-     * 乘以速度
-     * 计算阈值速度时将原速度乘粒子速度作为输出
-     */
-    @JsonField
-    public Boolean multiplySpeed;
 
 }

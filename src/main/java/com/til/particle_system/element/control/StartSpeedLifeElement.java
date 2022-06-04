@@ -1,4 +1,4 @@
-package com.til.particle_system.element.system;
+package com.til.particle_system.element.control;
 
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.JsonField;

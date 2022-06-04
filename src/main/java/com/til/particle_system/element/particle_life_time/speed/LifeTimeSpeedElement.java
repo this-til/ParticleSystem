@@ -20,18 +20,6 @@ public class LifeTimeSpeedElement implements IElement.IParticleElement {
      * -起始速度*该值
      */
     @JsonField
-    public ITime.ITimeNumber speed;
-
-    /***
-     * 轨道
-     * 将轨道速度应用于粒子，使其围绕系统中心旋转
-     */
-    public ITime.ITimeV3 track;
-
-    /***
-     * 偏移
-     * 将偏移应用于旋转中心
-     */
-    public ITime.ITimeV3 deviation;
+    public ITime.ITimeV3 speed;
 
 }

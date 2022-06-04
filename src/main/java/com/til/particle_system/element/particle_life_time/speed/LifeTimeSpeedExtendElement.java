@@ -18,7 +18,7 @@ public class LifeTimeSpeedExtendElement implements IElement.IParticleElement{
      * 层级
      */
     @JsonField
-    public ITime.ITimeNumber extend;
+    public ITime.ITimeV3 extend;
 
     @JsonField
     public ExtendType extendType;

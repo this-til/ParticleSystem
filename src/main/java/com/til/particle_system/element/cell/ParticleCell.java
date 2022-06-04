@@ -7,6 +7,7 @@ import com.til.json_read_write.util.math.V3;
 import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
+import com.til.particle_system.element.particle_life_time.move.LifeTimeForceElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeRotateElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeSpeedRotateElement;
 import com.til.particle_system.element.particle_life_time.size.LifeTimeSizeElement;
@@ -14,6 +15,7 @@ import com.til.particle_system.element.particle_life_time.size.LifeTimeSpeedSize
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedExtendElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedLimitElement;
+import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedResistanceElement;
 
 /***
  * 粒子
@@ -36,19 +38,18 @@ public class ParticleCell {
 
     /***
      * 开始的移动方位
-     * 由形状组件给出不可更改
+     * 由形状组件给出可更改
      */
-    public final V3 startMove;
-
+    public V3 startMove;
+    /***
+     * 位移
+     * 模表示速度
+     */
+    public V3 move;
     /***
      * 起始的颜色
      */
     public final Colour startColour;
-
-    /***
-     * 起始的速度
-     */
-    public double startSpeed;
     /***
      * 开始时大小
      */
@@ -86,10 +87,6 @@ public class ParticleCell {
      */
     public Colour colour;
     /***
-     * 粒子的速度
-     */
-    public double speed;
-    /***
      * 上t粒子的位置
      */
     public V3 oldPos;
@@ -112,7 +109,7 @@ public class ParticleCell {
         this.structureTime = time;
         MainElement mainElement = particleSystemCell.particleSystem.mainElement;
         this.startSize = mainElement.particleSize.as(time);
-        this.startSpeed = mainElement.particleSpeed.as(time).doubleValue();
+        //this.startSpeed = mainElement.particleSpeed.as(time).doubleValue();
         this.startColour = mainElement.particleColour.as(time);
         this.maxLife = mainElement.particleLife.as(time).intValue();
         this.rotate = particleSystemCell.particleSystem.shapeElement.getStartRotate(this);
@@ -129,51 +126,73 @@ public class ParticleCell {
         life++;
         if (life >= maxLife) {
             isDeath = true;
+        }
+        if (isDeath) {
             return;
         }
-
+        time = V2.getProportionStatic(0, maxLife, life);
+        writeOld();
+        writeStart();
+        //speed
         {
-            {
+            /*{
                 LifeTimeSpeedExtendElement element = particleSystemCell.particleSystem.lifeTimeSpeedExtendElement;
                 if (element != null) {
                     switch (element.extendType) {
-                        case ADD -> startSpeed += element.extend.as(time).doubleValue();
-                        case MULTIPLY -> startSpeed *= element.extend.as(time).doubleValue();
+                        case ADD -> startMove.add(element.extend.as(time));
+                        case MULTIPLY -> startMove.multiply(element.extend.as(time));
                     }
+                    move = startMove;
+                }
+            }*/
+            {
+                LifeTimeForceElement element = particleSystemCell.particleSystem.lifeTimeForceElement;
+                if (element != null) {
+                    startMove = startMove.add(element.force.as(time));
                 }
             }
+
             {
                 LifeTimeSpeedLimitElement element = particleSystemCell.particleSystem.lifeTimeSpeedLimitElement;
                 if (element != null) {
-                    double m = 1;
-                    if (element.multiplySize) {
-                        m *= size.magnitude();
+                    V3 threshold = element.threshold.as(time);
+                    V3 speedThreshold = element.speedThreshold.as(time);
+                    double nx = startMove.x;
+                    double ny = startMove.y;
+                    double nz = startMove.z;
+                    if (nx > threshold.x) {
+                        nx -= (nx - threshold.x) * Math.min(1, Math.max(0, speedThreshold.x));
                     }
-                    if (element.multiplySpeed) {
-                        m *= startSpeed;
+                    if (ny > threshold.y) {
+                        ny -= (ny - threshold.y) * Math.min(1, Math.max(0, speedThreshold.y));
                     }
-                    double d = element.threshold.as(time).doubleValue();
-                    double os = startSpeed * m;
-                    if (os > d) {
-                        startSpeed -= ((os - (d * m)) / m) * Math.min(0, Math.max(1, element.speedThreshold.as(time).doubleValue()));
+                    if (nz > threshold.z) {
+                        nz -= (nz - threshold.z) * Math.min(1, Math.max(0, speedThreshold.z));
                     }
+                    startMove = new V3(nx, ny, nz);
+                    move = startMove;
                 }
             }
-        }
-
-        writeOld();
-        writeStart();
-        time = V2.getProportionStatic(0, maxLife, life);
-        //speed
-        {
-
+            {
+                LifeTimeSpeedResistanceElement element = particleSystemCell.particleSystem.lifeTimeSpeedResistanceElement;
+                if (element != null) {
+                    double resistance = element.resistance.as(time).doubleValue();
+                    if (element.multiplySize) {
+                        resistance *= size.magnitude();
+                    }
+                    if (element.multiplySpeed) {
+                        resistance *= move.magnitude();
+                    }
+                    resistance = Math.min(1, Math.max(0, resistance));
+                    move.add(move.multiply(-resistance));
+                }
+            }
             {
                 LifeTimeSpeedElement element = particleSystemCell.particleSystem.lifeTimeSpeedElement;
                 if (element != null) {
-                    speed = speed * element.speed.as(time).doubleValue();
+                    move = move.multiply(element.speed.as(time));
                 }
             }
-
         }
         //rotate
         {
@@ -188,7 +207,7 @@ public class ParticleCell {
 
                 LifeTimeSpeedRotateElement element = particleSystemCell.particleSystem.lifeTimeSpeedRotateElement;
                 if (element != null) {
-                    rotate = rotate.multiply(new Quaternion(element.angularVelocity.as(element.speedRange.getProportion(speed))));
+                    rotate = rotate.multiply(new Quaternion(element.angularVelocity.as(element.speedRange.getProportion(move.magnitude()))));
                 }
             }
         }
@@ -204,7 +223,7 @@ public class ParticleCell {
 
                 LifeTimeSpeedSizeElement element = particleSystemCell.particleSystem.lifeTimeSpeedSizeElement;
                 if (element != null) {
-                    size = size.multiply(element.size.as(element.speedRange.getProportion(speed)));
+                    size = size.multiply(element.size.as(element.speedRange.getProportion(move.magnitude())));
                 }
             }
         }
@@ -219,11 +238,11 @@ public class ParticleCell {
             {
                 LifeTimeSpeedColourElement element = particleSystemCell.particleSystem.lifeTimeSpeedColourElement;
                 if (element != null) {
-                    colour = colour.multiply(element.colour.as(element.speedRange.getProportion(speed)));
+                    colour = colour.multiply(element.colour.as(element.speedRange.getProportion(move.magnitude())));
                 }
             }
         }
-        pos = pos.add(startMove.multiply(speed));
+        pos = pos.add(startMove);
     }
 
     public void writeOld() {
@@ -235,9 +254,8 @@ public class ParticleCell {
 
     public void writeStart() {
         size = startSize;
-        speed = startSpeed;
+        move = startMove;
         colour = startColour;
     }
-
 
 }

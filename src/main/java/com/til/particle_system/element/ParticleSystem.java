@@ -9,6 +9,7 @@ import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.main.ShapeElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
+import com.til.particle_system.element.particle_life_time.move.LifeTimeForceElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeRotateElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeSpeedRotateElement;
 import com.til.particle_system.element.particle_life_time.size.LifeTimeSizeElement;
@@ -16,7 +17,8 @@ import com.til.particle_system.element.particle_life_time.size.LifeTimeSpeedSize
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedExtendElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedLimitElement;
-import com.til.particle_system.element.system.StartSpeedLifeElement;
+import com.til.particle_system.element.control.StartSpeedLifeElement;
+import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedResistanceElement;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -72,6 +74,14 @@ public class ParticleSystem {
     @JsonField
     @Nullable
     public LifeTimeSpeedExtendElement lifeTimeSpeedExtendElement;
+
+    @JsonField
+    @Nullable
+    public LifeTimeForceElement lifeTimeForceElement;
+
+    @JsonField
+    @Nullable
+    public LifeTimeSpeedResistanceElement lifeTimeSpeedResistanceElement;
 
     @JsonField
     @Nullable

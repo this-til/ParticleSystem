@@ -9,7 +9,7 @@ public class ParticleSystemUtil {
      * 强行转换
      * @return 转换后
      */
-    public static <E> E forcedVonversion(Object obj) {
+    public static <E> E forcedConversion(Object obj) {
         //noinspection unchecked
         return (E) obj;
     }
