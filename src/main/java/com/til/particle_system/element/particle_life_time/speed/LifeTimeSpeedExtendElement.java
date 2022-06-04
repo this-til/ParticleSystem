@@ -5,6 +5,7 @@ import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
 import com.til.json_read_write.JsonTransform;
 import com.til.math.ITime;
+import com.til.math.IValue;
 import com.til.particle_system.element.IElement;
 
 /***
@@ -15,10 +16,10 @@ import com.til.particle_system.element.IElement;
 public class LifeTimeSpeedExtendElement implements IElement.IParticleElement{
 
     /***
-     * 层级
+     * 于原速度的乘积
      */
     @JsonField
-    public ITime.ITimeV3 extend;
+    public IValue.IValurV3 extend;
 
     @JsonField
     public ExtendType extendType;
@@ -27,13 +28,13 @@ public class LifeTimeSpeedExtendElement implements IElement.IParticleElement{
     @SonClass(transform = JsonTransform.EnumCurrencyJsonTransform.class)
     public enum ExtendType{
         /***
-         * 加成1
+         *
          */
-        ADD,
+        START,
         /***
          * 乘积
          */
-        MULTIPLY
+        ALWAYS;
     }
 
 }

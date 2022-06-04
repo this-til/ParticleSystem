@@ -8,13 +8,16 @@ import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
 import com.til.particle_system.element.particle_life_time.move.LifeTimeForceElement;
+import com.til.particle_system.element.particle_life_time.move.LifeTimeTrackElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeRotateElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeSpeedRotateElement;
 import com.til.particle_system.element.particle_life_time.size.LifeTimeSizeElement;
 import com.til.particle_system.element.particle_life_time.size.LifeTimeSpeedSizeElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedElement;
+import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedExtendElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedLimitElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedResistanceElement;
+import net.minecraft.world.phys.Vec3;
 
 /***
  * 粒子
@@ -115,10 +118,17 @@ public class ParticleCell {
         this.startMove = particleSystemCell.particleSystem.shapeElement.getStartMove(this);
         this.pos = particleSystemCell.particleSystem.shapeElement.getStartPos(this);
         this.rotate = new Quaternion(mainElement.particleRotate.as(time));
-
-
         writeStart();
         writeOld();
+        {
+            LifeTimeSpeedExtendElement element = particleSystemCell.particleSystem.lifeTimeSpeedExtendElement;
+            if (element != null && element.extendType.equals(LifeTimeSpeedExtendElement.ExtendType.START)) {
+                V3 move = particleSystemCell.iParticleSystemSupport.getPos().reduce(particleSystemCell.iParticleSystemSupport.getOldPos());
+                if (!move.isEmpty()) {
+                    startMove.add(move.multiply(element.extend.as()));
+                }
+            }
+        }
     }
 
     public void up() {
@@ -134,23 +144,22 @@ public class ParticleCell {
         writeStart();
         //speed
         {
-            /*{
-                LifeTimeSpeedExtendElement element = particleSystemCell.particleSystem.lifeTimeSpeedExtendElement;
-                if (element != null) {
-                    switch (element.extendType) {
-                        case ADD -> startMove.add(element.extend.as(time));
-                        case MULTIPLY -> startMove.multiply(element.extend.as(time));
-                    }
-                    move = startMove;
-                }
-            }*/
+
             {
                 LifeTimeForceElement element = particleSystemCell.particleSystem.lifeTimeForceElement;
                 if (element != null) {
                     startMove = startMove.add(element.force.as(time));
                 }
             }
-
+            {
+                LifeTimeSpeedExtendElement element = particleSystemCell.particleSystem.lifeTimeSpeedExtendElement;
+                if (element != null && element.extendType.equals(LifeTimeSpeedExtendElement.ExtendType.ALWAYS)) {
+                    V3 move = particleSystemCell.iParticleSystemSupport.getPos().reduce(particleSystemCell.iParticleSystemSupport.getOldPos());
+                    if (!move.isEmpty()) {
+                        startMove.add(move.multiply(element.extend.as()));
+                    }
+                }
+            }
             {
                 LifeTimeSpeedLimitElement element = particleSystemCell.particleSystem.lifeTimeSpeedLimitElement;
                 if (element != null) {
@@ -190,6 +199,26 @@ public class ParticleCell {
                 LifeTimeSpeedElement element = particleSystemCell.particleSystem.lifeTimeSpeedElement;
                 if (element != null) {
                     move = move.multiply(element.speed.as(time));
+                }
+            }
+            {
+                LifeTimeTrackElement element = particleSystemCell.particleSystem.lifeTimeTrackElement;
+                if (element != null) {
+                    V3 _pos = pos.add(element.deviation.as(time));
+                    V3 d = _pos.reduce(pos);
+                    V3 track = element.track.as(time);
+                    if (track.x != 0) {
+                        double yd = d.x;
+                        double zd = d.y;
+                    }
+                    if (track.y != 0) {
+                        double xd = d.x;
+                        double zd = d.z;
+                    }
+                    if (track.z != 0) {
+                        double xd = d.x;
+                        double yd = d.z;
+                    }
                 }
             }
         }

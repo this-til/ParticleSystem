@@ -68,6 +68,10 @@ public class Quaternion {
         return new Quaternion(w, -x, -y, -z);
     }
 
+    public boolean isEmpty() {
+        return w == 1 && x == 0 && y == 0 && z == 0;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

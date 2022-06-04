@@ -20,6 +20,11 @@ public class ParticleSystemCell {
     public final ParticleSystem particleSystem;
 
     /***
+     * 粒子系统的支持
+     */
+    public final IParticleSystemSupport iParticleSystemSupport;
+
+    /***
      * 子粒子
      */
     public final List<ParticleCell> particleCells;
@@ -44,21 +49,6 @@ public class ParticleSystemCell {
     public final boolean isLoop;
 
     /***
-     * 当前粒子系统的坐标
-     */
-    public V3 pos;
-
-    /***
-     * 粒子系统的旋转
-     */
-    public Quaternion rotate;
-
-    /***
-     * 粒子系统的大小
-     */
-    public V3 size;
-
-    /***
      * 当前生命
      */
     public int life;
@@ -77,24 +67,15 @@ public class ParticleSystemCell {
      */
     public double launchParticleAmount;
 
-    public ParticleSystemCell(ParticleSystem particleSystem, V3 pos, Quaternion rotate, V3 size) {
+    public ParticleSystemCell(ParticleSystem particleSystem, IParticleSystemSupport iParticleSystemSupport) {
         this.particleSystem = particleSystem;
-        this.pos = pos;
-        this.rotate = rotate;
-        this.size = size;
+        this.iParticleSystemSupport = iParticleSystemSupport;
         maxParticle = particleSystem.mainElement.maxParticle;
         particleCells = new List<>(maxParticle);
         maxLife = particleSystem.mainElement.maxLife;
         isLoop = particleSystem.mainElement.loop;
     }
 
-    /***
-     * 新的循环
-     */
-    public void newLoop() {
-        life = 0;
-        delay = particleSystem.mainElement.delay.as().intValue();
-    }
 
     /***
      * 毎t刷新
@@ -108,31 +89,42 @@ public class ParticleSystemCell {
             life++;
             if (life > maxLife) {
                 if (isLoop) {
-                    newLoop();
+                    life = 0;
+                    delay = particleSystem.mainElement.delay.as().intValue();
                 } else {
                     setDeath();
                 }
             }
         }
+        // 粒子的发射
         {
             launchParticleAmount += particleSystem.launchElement.timeGenerate.as(time).doubleValue();
             for (; launchParticleAmount > 0; launchParticleAmount--) {
                 launch();
             }
         }
-        upParticle();
+        // 粒子的刷新
+        {
+            particleCells.remove(e -> {
+                e.up();
+                return e.isDeath;
+            });
+        }
+        //系统的移动
+        {
+            if (particleSystem.mainElement.worldCoordinate.equals(MainElement.ParticleCoordinate.WORLD)) {
+                V3 move = iParticleSystemSupport.getPos().reduce(iParticleSystemSupport.getOldPos());
+                if (!move.isEmpty()) {
+                    particleCells.forEach(cell -> cell.pos.reduce(move));
+                }
+                Quaternion quaternion = iParticleSystemSupport.getRotate().multiply(iParticleSystemSupport.getOldRotate().inverse());
+                if (!quaternion.isEmpty()) {
+                    particleCells.forEach(cell -> cell.rotate.multiply(quaternion));
+                }
+            }
+        }
     }
 
-
-    /***
-     * 刷新粒子
-     */
-    protected void upParticle() {
-        particleCells.remove(e -> {
-            e.up();
-            return e.isDeath;
-        });
-    }
 
     /***
      * 发射粒子
@@ -154,34 +146,6 @@ public class ParticleSystemCell {
      */
     public void setDeath() {
         isDeath = true;
-    }
-
-    /***
-     * 移动粒子系统
-     * @param m 移动向量
-     */
-    public void move(V3 m) {
-        pos = pos.add(m);
-        MainElement mainElement = particleSystem.mainElement;
-        particleCells.forEach(cell -> mainElement.worldCoordinate.move(this, cell, m));
-    }
-
-    /***
-     * 旋转粒子系统
-     * @param r 旋转向量
-     */
-    public void rotate(Quaternion r) {
-        rotate = rotate.multiply(r);
-        MainElement mainElement = particleSystem.mainElement;
-        particleCells.forEach(cell -> mainElement.worldCoordinate.rotate(this, cell, r));
-    }
-
-    /***
-     * 设置粒子系统大小
-     * @param size 大小
-     */
-    public void setSize(V3 size) {
-        this.size = size;
     }
 
 }

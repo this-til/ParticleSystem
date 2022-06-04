@@ -10,6 +10,7 @@ import com.til.particle_system.element.main.ShapeElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
 import com.til.particle_system.element.particle_life_time.move.LifeTimeForceElement;
+import com.til.particle_system.element.particle_life_time.move.LifeTimeTrackElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeRotateElement;
 import com.til.particle_system.element.particle_life_time.rotate.LifeTimeSpeedRotateElement;
 import com.til.particle_system.element.particle_life_time.size.LifeTimeSizeElement;
@@ -82,6 +83,10 @@ public class ParticleSystem {
     @JsonField
     @Nullable
     public LifeTimeSpeedResistanceElement lifeTimeSpeedResistanceElement;
+
+    @JsonField
+    @Nullable
+    public LifeTimeTrackElement lifeTimeTrackElement;
 
     @JsonField
     @Nullable
