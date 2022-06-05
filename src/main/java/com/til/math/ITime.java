@@ -29,6 +29,7 @@ public interface ITime<E> {
 
     @BaseClass(sonClass = {ITimeNumber.NumberFinal.class, ITimeNumber.RandomNumber.class, ITimeNumber.Curve.class})
     @DefaultNew(newExample = ITimeNumber.NumberFinal.class)
+    @UsePrefab(route = {UseString.PREFAB, UseString.TIME, "number"})
     interface ITimeNumber extends ITime<Number> {
         @SonClass(transform = NumberFinal.NumberFinalJsonTransform.class)
         class NumberFinal implements ITimeNumber {
@@ -263,6 +264,7 @@ public interface ITime<E> {
 
     @BaseClass(sonClass = {ITimeV3.DefaultTimeV3.class, ITimeV3.NoSeparationTimeV3.class})
     @DefaultNew(newExample = ITimeV3.DefaultTimeV3.class)
+    @UsePrefab(route = {UseString.PREFAB, UseString.TIME, "v3"})
     interface ITimeV3 extends ITime<V3> {
 
         @SonClass()
@@ -296,6 +298,7 @@ public interface ITime<E> {
 
     @BaseClass(sonClass = {ITimeV2.DefaultTimeV2.class, ITimeV2.NoSeparationTimeV2.class})
     @DefaultNew(newExample = ITimeV2.DefaultTimeV2.class)
+    @UsePrefab(route = {UseString.PREFAB, UseString.TIME, "v2"})
     interface ITimeV2 extends ITime<V2> {
 
         @SonClass()
@@ -326,9 +329,10 @@ public interface ITime<E> {
 
     @BaseClass(sonClass = {ITimeColour.DefaultTimeColour.class, ITimeColour.NoSeparationTimeColour.class})
     @DefaultNew(newExample = ITimeColour.DefaultTimeColour.class)
+    @UsePrefab(route = {UseString.PREFAB, UseString.TIME, "colour"})
     interface ITimeColour extends ITime<Colour> {
 
-        @SonClass(name = UseString.VALUE)
+        @SonClass()
         class DefaultTimeColour implements ITimeColour {
 
             @JsonField

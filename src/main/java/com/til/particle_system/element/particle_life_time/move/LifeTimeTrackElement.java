@@ -20,10 +20,9 @@ public class LifeTimeTrackElement {
     public ITime.ITimeV3 track;
 
     /***
-     * 偏移
-     * 将偏移应用于旋转中心
+     * 轨道计算三角函数时将该值*粒子时间
      */
     @JsonField
-    public ITime.ITimeV3 deviation;
+    public ITime.ITimeNumber time;
 
 }

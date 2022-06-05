@@ -39,7 +39,7 @@ public class ParticleSystemCell {
      */
     public final int maxLife;
     /***
-     * 相对于maxLife和life的时间
+     * life和maxLife的比值
      */
     public double time;
 
@@ -86,7 +86,9 @@ public class ParticleSystemCell {
             if (delay-- > 0) {
                 return;
             }
-            life++;
+            if (!particleSystem.mainElement.bufferMode.equals(MainElement.ParticleBufferMode.SUSPEND) && particleCells.size() <= maxParticle){
+                life++;
+            }
             if (life > maxLife) {
                 if (isLoop) {
                     life = 0;

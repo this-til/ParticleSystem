@@ -1,8 +1,11 @@
 package com.til.util;
 
+import com.til.math.V3;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
+import java.util.StringJoiner;
 
 /***
  * @author til
@@ -27,14 +30,15 @@ public class Util {
                 if (!Modifier.isStatic(field.getModifiers())) {
                     fieldList.add(field);
                 }
-            } StringBuilder sb = new StringBuilder();
+            }
+            StringBuilder sb = new StringBuilder();
             sb.append("{");
             sb.append("_classType=[");
             sb.append(o.getClass().toString());
             sb.append("]");
             if (fieldList.size() == 0) {
-              sb.append("}");
-              return sb.toString();
+                sb.append("}");
+                return sb.toString();
             }
             Iterator<Field> iterator = fieldList.iterator();
             while (iterator.hasNext()) {
@@ -50,7 +54,7 @@ public class Util {
                 sb.append("]");
                 if (!iterator.hasNext()) {
                     sb.append('}');
-                   break;
+                    break;
                 }
             }
             return sb.toString();
@@ -59,16 +63,37 @@ public class Util {
         }
     }
 
-    public static float section(float e, float a, float b) {
+    public static float limit(float e, float a, float b) {
         float max = Math.max(a, b);
         float min = Math.min(a, b);
         return e > max ? max : Math.max(e, min);
     }
 
-    public static double section(double e, double a, double b) {
+    /***
+     * f返回目标值在ab之间，过大或过小取a或b
+     * @param e 目标
+     * @param a 大或小
+     * @param b 大或小
+     */
+    public static double limit(double e, double a, double b) {
         double max = Math.max(a, b);
         double min = Math.min(a, b);
         return e > max ? max : Math.max(e, min);
+    }
+
+    public static V3 limit(V3 e, double a, double b) {
+        return new V3(Util.limit(e.x, 0, 1), Util.limit(e.y, 0, 1), Util.limit(e.z, 0, 1));
+    }
+
+    /***
+     * 拼接路径
+     */
+    public static String splicingRoute(String... strings) {
+        StringJoiner stringJoiner = new StringJoiner("/");
+        for (String string : strings) {
+            stringJoiner.add(string);
+        }
+        return stringJoiner.toString();
     }
 
 }

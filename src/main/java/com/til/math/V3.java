@@ -1,9 +1,7 @@
 package com.til.math;
 
-import com.til.json_read_write.annotation.BaseClass;
-import com.til.json_read_write.annotation.DefaultNew;
-import com.til.json_read_write.annotation.JsonField;
-import com.til.json_read_write.annotation.SonClass;
+import com.til.json_read_write.annotation.*;
+import com.til.util.UseString;
 import net.minecraft.world.phys.Vec3;
 
 /***
@@ -13,6 +11,7 @@ import net.minecraft.world.phys.Vec3;
 @BaseClass(sonClass = V3.class)
 @SonClass()
 @DefaultNew(newExample = V3.class)
+@UsePrefab(route = {UseString.PREFAB, "v3"})
 public class V3 {
     /***
      * pitch
@@ -84,6 +83,10 @@ public class V3 {
 
     public V3 add(V3 v3) {
         return new V3(x + v3.x, y + v3.y, z + v3.z);
+    }
+
+    public V3 add(double x, double y, double z) {
+        return new V3(this.x + x, this.y + y, this.z + z)
     }
 
     public V3 reduce(double d) {

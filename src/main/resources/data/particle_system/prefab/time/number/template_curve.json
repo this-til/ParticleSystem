@@ -1,0 +1,25 @@
+{
+  "type": "curve",
+  "posList": [
+    {
+      "mainPos": {
+        "x": 0,
+        "y": 0
+      },
+      "afterAnchorPoint": {
+        "x": 1,
+        "y": 1
+      }
+    },
+    {
+      "mainPos": {
+        "x": 1,
+        "y": 0
+      },
+      "frontAnchorPoint": {
+        "x": -1,
+        "y": -1
+      }
+    }
+  ]
+}

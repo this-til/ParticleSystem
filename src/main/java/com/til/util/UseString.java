@@ -12,6 +12,7 @@ public class UseString {
     public static final String NO_SEPARATION = "no_separation";
     public static final String CURVE = "curve";
     public static final String RANDOM_CURVE = "random_curve";
+    public static final String USE_PREFAB = "use_prefab";
 
     public static final String TYPE = "type";
     public static final String MAX = "max";
@@ -26,4 +27,8 @@ public class UseString {
     public static final String A = "a";
     public static final String W = "w";
 
+    public static final String MAIN = "main";
+
+    public static final String PREFAB = "prefab";
+    public static final String TIME = "time";
 }

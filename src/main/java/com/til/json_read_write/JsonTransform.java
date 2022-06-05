@@ -69,7 +69,7 @@ public abstract class JsonTransform<E> {
                         }
                     }
                 } catch (Exception exception) {
-                    MainParticleSystem.main.logger.error(MessageFormat.format("解析[{0}]的[{1}]字段出现问题", e, declaredField), exception);
+                    MainParticleSystem.main.logger.error(MessageFormat.format("序列化类型为[{0}]，实例为[{1}]，字段为[{2}]时出现问题", type, e, declaredField), exception);
                 }
             }
 
@@ -113,7 +113,7 @@ public abstract class JsonTransform<E> {
                         }
                     }
                 } catch (Exception exception) {
-                    MainParticleSystem.main.logger.error(MessageFormat.format("解析[{0}]时[{1}]字段出现问题", jsonElement, declaredField), exception);
+                    MainParticleSystem.main.logger.error(MessageFormat.format("反序列化类型为[{0}]，json为[{1}]，字段为[{2}]时出现问题", type, jsonElement, declaredField), exception);
                 }
             }
             return e;

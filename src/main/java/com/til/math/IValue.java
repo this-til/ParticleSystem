@@ -2,10 +2,7 @@ package com.til.math;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import com.til.json_read_write.annotation.BaseClass;
-import com.til.json_read_write.annotation.DefaultNew;
-import com.til.json_read_write.annotation.JsonField;
-import com.til.json_read_write.annotation.SonClass;
+import com.til.json_read_write.annotation.*;
 import com.til.json_read_write.JsonAnalysis;
 import com.til.json_read_write.JsonTransform;
 import com.til.util.UseString;
@@ -25,6 +22,7 @@ public interface IValue<E> {
 
     @BaseClass(sonClass = {IValueNumber.FinalNumber.class, IValueNumber.RandomNumber.class})
     @DefaultNew(newExample = IValueNumber.FinalNumber.class)
+    @UsePrefab(route = {UseString.PREFAB,UseString.VALUE ,"number"})
     interface IValueNumber extends IValue<Number> {
 
         @SonClass(transform = FinalNumber.NumberFinalTransform.class)
@@ -62,32 +60,27 @@ public interface IValue<E> {
 
         }
 
-        @SonClass()
+        @SonClass(name = UseString.RANDOM)
         class RandomNumber implements IValueNumber {
 
             @JsonField
-            public double max;
+            public IValueNumber max;
             @JsonField
-            public double min;
+            public IValueNumber min;
             public Random random = new Random();
-
-            public RandomNumber() {
-                super();
-                max = 0;
-                min = 0;
-            }
 
             @Override
             public Number as() {
-                double d1 = max;
-                double d2 = min;
+                double d1 = max.as().doubleValue();
+                double d2 = min.as().doubleValue();
                 return random.nextDouble(Math.min(d1, d2), Math.max(d1, d2));
             }
         }
     }
 
-    @BaseClass(sonClass = IValurV2.ValurV2.class)
+    @BaseClass(sonClass = {IValurV2.ValurV2.class, IValurV2.NoSeparationValurV2.class})
     @DefaultNew(newExample = IValurV2.ValurV2.class)
+    @UsePrefab(route = {UseString.PREFAB,UseString.VALUE ,"v2"})
     interface IValurV2 extends IValue<V2> {
         @SonClass()
         class ValurV2 implements IValurV2 {
@@ -116,8 +109,9 @@ public interface IValue<E> {
 
     }
 
-    @BaseClass(sonClass = IValurV3.ValurV3.class)
+    @BaseClass(sonClass = {IValurV3.ValurV3.class, IValurV3.NoSeparationValurV3.class})
     @DefaultNew(newExample = IValurV3.ValurV3.class)
+    @UsePrefab(route = {UseString.PREFAB,UseString.VALUE ,"v3"})
     interface IValurV3 extends IValue<V3> {
 
         @SonClass()
@@ -147,5 +141,40 @@ public interface IValue<E> {
             }
         }
 
+    }
+
+    @BaseClass(sonClass = {IValurColour.ValurColour.class, IValurColour.NoSeparationValurColour.class})
+    @DefaultNew(newExample = IValurColour.ValurColour.class)
+    @UsePrefab(route = {UseString.PREFAB,UseString.VALUE ,"colour"})
+    interface IValurColour extends IValue<Colour> {
+
+        @SonClass()
+        class ValurColour implements IValue<Colour> {
+
+            @JsonField
+            public IValueNumber r;
+            @JsonField
+            public IValueNumber g;
+            @JsonField
+            public IValueNumber b;
+            @JsonField
+            public IValueNumber a;
+
+            @Override
+            public Colour as() {
+                return new Colour(r.as().doubleValue(), g.as().doubleValue(), b.as().doubleValue(), a.as().doubleValue());
+            }
+        }
+
+        @SonClass(name = UseString.NO_SEPARATION)
+        class NoSeparationValurColour implements IValue<Colour> {
+            @JsonField
+            public IValueNumber value;
+
+            @Override
+            public Colour as() {
+                return new Colour(value.as().doubleValue(), value.as().doubleValue(), value.as().doubleValue(), value.as().doubleValue());
+            }
+        }
     }
 }

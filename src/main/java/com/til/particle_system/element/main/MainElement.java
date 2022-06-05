@@ -101,36 +101,11 @@ public class MainElement implements IElement {
         /***
          * 世界坐标系
          */
-        WORLD {
-            @Override
-            public void move(ParticleSystemCell particleSystemCell, ParticleCell particleCell, V3 mainMove) {
-                particleCell.pos = particleCell.pos.reduce(mainMove);
-            }
-
-            @Override
-            public void rotate(ParticleSystemCell particleSystemCell, ParticleCell particleCell, Quaternion mainRotate) {
-                particleCell.rotate = particleCell.rotate.multiply(mainRotate.inverse());
-            }
-        },
+        WORLD,
         /***
          * 局部坐标系
          */
-        ENTITY {
-            @Override
-            public void move(ParticleSystemCell particleSystemCell, ParticleCell particleCell, V3 mainMove) {
-
-            }
-
-            @Override
-            public void rotate(ParticleSystemCell particleSystemCell, ParticleCell particleCell, Quaternion mainRotate) {
-
-            }
-        };
-
-        public abstract void move(ParticleSystemCell particleSystemCell, ParticleCell particleCell, V3 mainMove);
-
-        public abstract void rotate(ParticleSystemCell particleSystemCell, ParticleCell particleCell, Quaternion mainRotate);
-
+        ENTITY;
     }
 
     @BaseClass(sonClass = ParticleBufferMode.class)

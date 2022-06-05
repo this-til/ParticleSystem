@@ -5,21 +5,26 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.SonClass;
+import com.til.json_read_write.annotation.UsePrefab;
 import com.til.util.Util;
 import com.til.util.Map;
 import com.til.util.UseString;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 
 /***
  * @author til
  */
 public class JsonAnalysis {
     public final Map<Class<?>, SonCell<?>> MAP = new Map<>();
-    public static final Map<Class<?>, JsonTransform<?>> JSON_ANALYSIS_MAP_MAP = new Map<>();
+    public final Map<Class<?>, JsonTransform<?>> JSON_ANALYSIS_MAP_MAP = new Map<>();
+    public final Map<Class<?>, ReadIO.JsonReloadListenerCell<?>> USE_PREFAB_MAP = new Map<>();
     public final ReadIO readIO;
 
     public JsonAnalysis() {
         init(this);
         readIO = new ReadIO(this);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public <E> JsonTransform<E> getJsonTransform(Class<E> target) throws Exception {
@@ -42,6 +47,9 @@ public class JsonAnalysis {
         } else {
             SonCell<E> sonCell = Util.forcedConversion(new SonCell<>(eClass.getAnnotation(BaseClass.class), this));
             MAP.put(eClass, sonCell);
+            if (eClass.isAnnotationPresent(UsePrefab.class)) {
+                USE_PREFAB_MAP.put(eClass, readIO.add(Util.splicingRoute(eClass.getAnnotation(UsePrefab.class).route()), eClass));
+            }
             return sonCell;
         }
     }
@@ -50,21 +58,50 @@ public class JsonAnalysis {
         MAP.put(eClass, sonCell);
     }
 
+    /***
+     * 除去注解声明的类型之外再添加编译元素
+     */
+    public <E> void add(Class<E> basics, Class<E> eClass) throws Exception {
+        SonClass sonClass = eClass.getAnnotation(SonClass.class);
+        get(basics).add(eClass, sonClass.name(), Util.forcedConversion(getJsonTransform(sonClass.transform())));
+    }
+
+    /***
+     * 反序列化
+     */
     public <E> E as(Class<E> eClass, JsonElement jsonElement) throws Exception {
         SonCell<E> sonCell = get(eClass);
         if (jsonElement.isJsonObject()) {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             if (jsonObject.has(UseString.TYPE) && jsonObject.get(UseString.TYPE).isJsonPrimitive()) {
-                return sonCell.as(jsonObject.get(UseString.TYPE).getAsString(), jsonElement);
+                String type = jsonObject.get(UseString.TYPE).getAsString();
+                if (type.equals(UseString.USE_PREFAB)) {
+                    if (USE_PREFAB_MAP.containsKey(eClass)) {
+                        for (java.util.Map.Entry<ResourceLocation, ?> entry : USE_PREFAB_MAP.get(eClass).map.entrySet()) {
+                            if (entry.getKey().equals(new ResourceLocation(jsonObject.get(UseString.PREFAB).getAsString()))) {
+                                return Util.forcedConversion(entry.getValue());
+                            }
+                        }
+                    }
+                }
+                return sonCell.as(type, jsonElement);
             }
         }
         return sonCell.as(UseString.DEFAULT, jsonElement);
     }
 
+    /***
+     * 序列化
+     * @param baseType 父类型
+     */
     public <E> JsonElement from(Class<E> baseType, E e) throws Exception {
         return get(baseType).from(e);
     }
 
+    /***
+     * 序列化
+     * 父类型为对象类型
+     */
     public <E> JsonElement from(E e) throws Exception {
         return from(Util.forcedConversion(e.getClass()), e);
     }
@@ -88,19 +125,32 @@ public class JsonAnalysis {
             }
         }
 
+        /***
+         * 添加解析元素
+         */
         public void add(Class<E> type, String name, JsonTransform<E> jsonTransform) {
             classMap.put(name, type);
             jsonTransformMap.put(type, jsonTransform);
         }
 
+        /***
+         * 反序列化
+         */
         public E as(Class<E> type, JsonElement jsonElement) throws Exception {
             return jsonTransformMap.get(type).as(jsonElement);
         }
 
+        /***
+         * 反序列化
+         */
         public E as(String type, JsonElement jsonElement) throws Exception {
             return as(classMap.get(type), jsonElement);
         }
 
+        /***
+         * 序列化
+         * 父类型为对象类型
+         */
         public JsonElement from(E e) throws Exception {
             Class<?> eClass = e.getClass();
             JsonElement jsonElement = jsonTransformMap.get(eClass).from(e);
@@ -305,25 +355,40 @@ public class JsonAnalysis {
             jsonAnalysis.add(boolean.class, sonCell);
             jsonAnalysis.add(Boolean.class, sonCell);
         }
-        {
-            SonCell<String> sonCell = new SonCell<>(jsonAnalysis) {
-                @Override
-                public String as(Class<String> type, JsonElement jsonElement) {
-                    return jsonElement.isJsonObject() ? jsonElement.toString() : jsonElement.getAsString();
-                }
 
-                @Override
-                public String as(String type, JsonElement jsonElement) {
-                    return jsonElement.isJsonObject() ? jsonElement.toString() : jsonElement.getAsString();
-                }
+        jsonAnalysis.add(String.class, new SonCell<>(jsonAnalysis) {
+            @Override
+            public String as(Class<String> type, JsonElement jsonElement) {
+                return jsonElement.isJsonObject() ? jsonElement.toString() : jsonElement.getAsString();
+            }
 
-                @Override
-                public JsonElement from(String s) {
-                    return new JsonPrimitive(s);
-                }
-            };
-            jsonAnalysis.add(String.class, sonCell);
-        }
+            @Override
+            public String as(String type, JsonElement jsonElement) {
+                return jsonElement.isJsonObject() ? jsonElement.toString() : jsonElement.getAsString();
+            }
+
+            @Override
+            public JsonElement from(String s) {
+                return new JsonPrimitive(s);
+            }
+        });
+        jsonAnalysis.add(JsonElement.class, new SonCell<>(jsonAnalysis) {
+            @Override
+            public JsonElement as(Class<JsonElement> type, JsonElement jsonElement) throws Exception {
+                return jsonElement;
+            }
+
+            @Override
+            public JsonElement as(String type, JsonElement jsonElement) throws Exception {
+                return jsonElement;
+            }
+
+            @Override
+            public JsonElement from(JsonElement jsonElement) throws Exception {
+                return jsonElement;
+            }
+        });
+
     }
 
 

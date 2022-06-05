@@ -1,9 +1,7 @@
 package com.til.math;
 
-import com.til.json_read_write.annotation.BaseClass;
-import com.til.json_read_write.annotation.DefaultNew;
-import com.til.json_read_write.annotation.JsonField;
-import com.til.json_read_write.annotation.SonClass;
+import com.til.json_read_write.annotation.*;
+import com.til.util.UseString;
 
 /***
  * 二维向量
@@ -12,6 +10,7 @@ import com.til.json_read_write.annotation.SonClass;
 @BaseClass(sonClass = V2.class)
 @SonClass()
 @DefaultNew(newExample = V2.class)
+@UsePrefab(route = {UseString.PREFAB, "v2"})
 public class V2 {
     @JsonField
     public final double x;

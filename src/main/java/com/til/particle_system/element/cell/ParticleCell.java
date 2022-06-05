@@ -17,7 +17,7 @@ import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedEle
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedExtendElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedLimitElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedResistanceElement;
-import net.minecraft.world.phys.Vec3;
+import com.til.util.Util;
 
 /***
  * 粒子
@@ -70,6 +70,10 @@ public class ParticleCell {
      * 时间进度用0~1表示粒子生命
      */
     public double time;
+    /***
+     * 上一t的时间进度
+     */
+    public double oldTime;
 
 
     /***
@@ -149,6 +153,7 @@ public class ParticleCell {
                 LifeTimeForceElement element = particleSystemCell.particleSystem.lifeTimeForceElement;
                 if (element != null) {
                     startMove = startMove.add(element.force.as(time));
+                    move = startMove;
                 }
             }
             {
@@ -156,7 +161,58 @@ public class ParticleCell {
                 if (element != null && element.extendType.equals(LifeTimeSpeedExtendElement.ExtendType.ALWAYS)) {
                     V3 move = particleSystemCell.iParticleSystemSupport.getPos().reduce(particleSystemCell.iParticleSystemSupport.getOldPos());
                     if (!move.isEmpty()) {
-                        startMove.add(move.multiply(element.extend.as()));
+                        startMove = startMove.add(move.multiply(element.extend.as()));
+                        this.move = startMove;
+                    }
+                }
+            }
+            {
+                LifeTimeSpeedResistanceElement element = particleSystemCell.particleSystem.lifeTimeSpeedResistanceElement;
+                if (element != null) {
+                    double resistance = element.resistance.as(time).doubleValue();
+                    if (element.multiplySize) {
+                        resistance *= size.magnitude();
+                    }
+                    if (element.multiplySpeed) {
+                        resistance *= move.magnitude();
+                    }
+                    resistance = Math.min(1, Math.max(0, resistance));
+                    move = move.add(move.multiply(-resistance));
+                }
+            }
+            {
+                LifeTimeSpeedElement element = particleSystemCell.particleSystem.lifeTimeSpeedElement;
+                if (element != null) {
+                    move = move.multiply(element.speed.as(time));
+                }
+            }
+            {
+                LifeTimeTrackElement element = particleSystemCell.particleSystem.lifeTimeTrackElement;
+                if (element != null) {
+                    V3 track = element.track.as(time);
+                    double eTime = element.time.as(time).doubleValue();
+                    double _time = time * eTime;
+                    double _oldTime = oldTime * eTime;
+                    if (track.x != 0) {
+                        //y,z
+                        V3 _oldPos = new V3(0, Math.sin(_oldTime) * track.x, Math.cos(_oldTime) * track.x);
+                        V3 _pos = new V3(0, Math.sin(_time) * track.x, Math.cos(_time) * track.x);
+                        V3 _move = _pos.reduce(_oldPos);
+                        move = move.add(_move);
+                    }
+                    if (track.y != 0) {
+                        //x,z
+                        V3 _oldPos = new V3(Math.sin(_oldTime) * track.y, 0, Math.cos(_oldTime) * track.y);
+                        V3 _pos = new V3(Math.sin(_time) * track.y, 0, Math.cos(_time) * track.y);
+                        V3 _move = _pos.reduce(_oldPos);
+                        move = move.add(_move);
+                    }
+                    if (track.z != 0) {
+                        //x,y
+                        V3 _oldPos = new V3(Math.sin(_oldTime) * track.x, Math.cos(_oldTime) * track.x, 0);
+                        V3 _pos = new V3(Math.sin(_time) * track.x, Math.cos(_time) * track.x, 0);
+                        V3 _move = _pos.reduce(_oldPos);
+                        move = move.add(_move);
                     }
                 }
             }
@@ -179,46 +235,6 @@ public class ParticleCell {
                     }
                     startMove = new V3(nx, ny, nz);
                     move = startMove;
-                }
-            }
-            {
-                LifeTimeSpeedResistanceElement element = particleSystemCell.particleSystem.lifeTimeSpeedResistanceElement;
-                if (element != null) {
-                    double resistance = element.resistance.as(time).doubleValue();
-                    if (element.multiplySize) {
-                        resistance *= size.magnitude();
-                    }
-                    if (element.multiplySpeed) {
-                        resistance *= move.magnitude();
-                    }
-                    resistance = Math.min(1, Math.max(0, resistance));
-                    move.add(move.multiply(-resistance));
-                }
-            }
-            {
-                LifeTimeSpeedElement element = particleSystemCell.particleSystem.lifeTimeSpeedElement;
-                if (element != null) {
-                    move = move.multiply(element.speed.as(time));
-                }
-            }
-            {
-                LifeTimeTrackElement element = particleSystemCell.particleSystem.lifeTimeTrackElement;
-                if (element != null) {
-                    V3 _pos = pos.add(element.deviation.as(time));
-                    V3 d = _pos.reduce(pos);
-                    V3 track = element.track.as(time);
-                    if (track.x != 0) {
-                        double yd = d.x;
-                        double zd = d.y;
-                    }
-                    if (track.y != 0) {
-                        double xd = d.x;
-                        double zd = d.z;
-                    }
-                    if (track.z != 0) {
-                        double xd = d.x;
-                        double yd = d.z;
-                    }
                 }
             }
         }

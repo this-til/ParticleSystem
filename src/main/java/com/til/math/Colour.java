@@ -1,9 +1,7 @@
 package com.til.math;
 
-import com.til.json_read_write.annotation.BaseClass;
-import com.til.json_read_write.annotation.DefaultNew;
-import com.til.json_read_write.annotation.JsonField;
-import com.til.json_read_write.annotation.SonClass;
+import com.til.json_read_write.annotation.*;
+import com.til.util.UseString;
 import com.til.util.Util;
 
 import java.awt.*;
@@ -15,6 +13,7 @@ import java.awt.*;
 @BaseClass(sonClass = Colour.class)
 @SonClass()
 @DefaultNew(newExample = Colour.class)
+@UsePrefab(route = {UseString.PREFAB, "colour"})
 public class Colour {
 
     @JsonField
@@ -41,10 +40,10 @@ public class Colour {
     }
 
     public Color as() {
-        return new Color((float) Util.section(r, 1, 0),
-                (float) Util.section(g, 1, 0),
-                (float) Util.section(b, 1, 0),
-                (float) Util.section(a, 1, 0));
+        return new Color((float) Util.limit(r, 1, 0),
+                (float) Util.limit(g, 1, 0),
+                (float) Util.limit(b, 1, 0),
+                (float) Util.limit(a, 1, 0));
     }
 
     public Colour multiply(double d) {
