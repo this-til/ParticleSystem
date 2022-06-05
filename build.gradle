@@ -153,6 +153,9 @@ repositories {
         dir 'libs'
     }
 
+    maven { url 'https://maven.blamejared.com' }
+
+
 }
 
 dependencies {

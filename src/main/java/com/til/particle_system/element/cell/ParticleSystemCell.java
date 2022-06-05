@@ -2,11 +2,16 @@ package com.til.particle_system.element.cell;
 
 
 import com.til.math.V2;
+import com.til.particle_system.element.main.LaunchElement;
+import com.til.util.Extension;
 import com.til.util.List;
 import com.til.math.Quaternion;
 import com.til.math.V3;
 import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.ParticleSystem;
+import com.til.util.Map;
+
+import java.util.Random;
 
 /***
  * 一个粒子系统的元素
@@ -28,6 +33,10 @@ public class ParticleSystemCell {
      * 子粒子
      */
     public final List<ParticleCell> particleCells;
+
+    public final Map<LaunchElement.LaunchBurst, Extension.Data2<Integer, Integer>> launchBurstMap;
+
+    public final Random rand = new Random();
 
     /***
      * 最大粒子数
@@ -71,7 +80,9 @@ public class ParticleSystemCell {
         this.particleSystem = particleSystem;
         this.iParticleSystemSupport = iParticleSystemSupport;
         maxParticle = particleSystem.mainElement.maxParticle;
-        particleCells = new List<>(maxParticle);
+        particleCells = new List<>(Math.min(maxParticle, 32));
+        launchBurstMap = new Map<>();
+        particleSystem.launchElement.launchBursts.forEach(e -> launchBurstMap.put(e, new Extension.Data2<>(e.needTime.intValue(), e.cycle.intValue())));
         maxLife = particleSystem.mainElement.maxLife;
         isLoop = particleSystem.mainElement.loop;
     }
@@ -81,12 +92,13 @@ public class ParticleSystemCell {
      * 毎t刷新
      */
     public void up() {
+        V3 move = iParticleSystemSupport.getPos().reduce(iParticleSystemSupport.getOldPos());
         {
             time = V2.getProportionStatic(0, maxLife, life);
             if (delay-- > 0) {
                 return;
             }
-            if (!particleSystem.mainElement.bufferMode.equals(MainElement.ParticleBufferMode.SUSPEND) && particleCells.size() <= maxParticle){
+            if (!particleSystem.mainElement.bufferMode.equals(MainElement.ParticleBufferMode.SUSPEND) && particleCells.size() <= maxParticle) {
                 life++;
             }
             if (life > maxLife) {
@@ -101,9 +113,26 @@ public class ParticleSystemCell {
         // 粒子的发射
         {
             launchParticleAmount += particleSystem.launchElement.timeGenerate.as(time).doubleValue();
+            launchParticleAmount += particleSystem.launchElement.moveGenerate.as(time).doubleValue() * move.magnitude();
             for (; launchParticleAmount > 0; launchParticleAmount--) {
                 launch();
             }
+            launchBurstMap.forEach((k, v) -> {
+                if (v.d2 < 0) {
+                    return;
+                }
+                v.d1--;
+                if (v.d1 <= 0) {
+                    v.d2++;
+                    v.d1 = k.intervalTime.as(time).intValue();
+                    if (rand.nextDouble() < k.probability.as().doubleValue()) {
+                        int a = k.amount.as(time).intValue();
+                        for (int i = 0; i < a; i++) {
+                            launch();
+                        }
+                    }
+                }
+            });
         }
         // 粒子的刷新
         {
@@ -115,7 +144,6 @@ public class ParticleSystemCell {
         //系统的移动
         {
             if (particleSystem.mainElement.worldCoordinate.equals(MainElement.ParticleCoordinate.WORLD)) {
-                V3 move = iParticleSystemSupport.getPos().reduce(iParticleSystemSupport.getOldPos());
                 if (!move.isEmpty()) {
                     particleCells.forEach(cell -> cell.pos.reduce(move));
                 }

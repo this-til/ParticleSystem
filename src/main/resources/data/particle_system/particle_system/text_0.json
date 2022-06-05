@@ -1,0 +1,40 @@
+{
+  "mainElement": {
+    "loop": false,
+    "delay": 0,
+    "particleLife": 100,
+    "particleSpeed": 0,
+    "particleSize": 10,
+    "particleRotate": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "particleColour": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 1
+    },
+    "particleGravity": 0,
+    "worldCoordinate": "WORLD",
+    "ParticleBufferMode": "IGNORE",
+    "maxParticle": 5
+  },
+  "launchElement": {
+    "timeGenerate": 0,
+    "moveGenerate": 0,
+    "launchBursts": [
+      {
+        "needTime": 0,
+        "cycle": 1,
+        "amount": 1,
+        "intervalTime": 1,
+        "probability": 1
+      }
+    ]
+  },
+  "shapeElement": {
+    "type": "empty"
+  }
+}

@@ -58,6 +58,11 @@ public class LaunchElement implements IElement {
         public Number cycle;
 
         /***
+         * 间隔时间
+         */
+        public ITime.ITimeNumber intervalTime;
+
+        /***
          * 爆发时数量
          */
         @JsonField

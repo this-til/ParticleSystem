@@ -18,6 +18,9 @@ import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedExt
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedLimitElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedResistanceElement;
 import com.til.util.Util;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import org.lwjgl.opengl.AMDVertexShaderTessellator;
 
 /***
  * 粒子
@@ -37,6 +40,10 @@ public class ParticleCell {
      * 粒子最大生命
      */
     public final int maxLife;
+    /***
+     * 粒子重力
+     */
+    public final double gravity;
 
     /***
      * 开始的移动方位
@@ -118,6 +125,7 @@ public class ParticleCell {
         //this.startSpeed = mainElement.particleSpeed.as(time).doubleValue();
         this.startColour = mainElement.particleColour.as(time);
         this.maxLife = mainElement.particleLife.as(time).intValue();
+        this.gravity = mainElement.particleGravity.as(time).doubleValue();
         this.rotate = particleSystemCell.particleSystem.shapeElement.getStartRotate(this);
         this.startMove = particleSystemCell.particleSystem.shapeElement.getStartMove(this);
         this.pos = particleSystemCell.particleSystem.shapeElement.getStartPos(this);
@@ -286,6 +294,7 @@ public class ParticleCell {
                 }
             }
         }
+        MultiBufferSource multiBufferSource;
         pos = pos.add(startMove);
     }
 

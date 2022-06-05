@@ -86,7 +86,7 @@ public class V3 {
     }
 
     public V3 add(double x, double y, double z) {
-        return new V3(this.x + x, this.y + y, this.z + z)
+        return new V3(this.x + x, this.y + y, this.z + z);
     }
 
     public V3 reduce(double d) {
