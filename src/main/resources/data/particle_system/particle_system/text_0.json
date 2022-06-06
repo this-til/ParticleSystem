@@ -4,7 +4,10 @@
     "delay": 0,
     "particleLife": 100,
     "particleSpeed": 0,
-    "particleSize": 10,
+    "particleSize": {
+      "type":"no_separation",
+      "value": 10
+    },
     "particleRotate": {
       "x": 0,
       "y": 0,

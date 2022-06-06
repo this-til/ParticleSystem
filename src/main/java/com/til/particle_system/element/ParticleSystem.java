@@ -6,6 +6,7 @@ import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
 import com.til.particle_system.element.main.LaunchElement;
 import com.til.particle_system.element.main.MainElement;
+import com.til.particle_system.element.main.RenderElement;
 import com.til.particle_system.element.main.ShapeElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
@@ -39,6 +40,13 @@ public class ParticleSystem {
 
     @JsonField
     public ShapeElement shapeElement;
+
+    @JsonField
+    public RenderElement renderElement;
+
+    @JsonField
+    @Nullable
+    public StartSpeedLifeElement startSpeedLifeElement;
 
     @JsonField
     @Nullable
@@ -87,10 +95,6 @@ public class ParticleSystem {
     @JsonField
     @Nullable
     public LifeTimeTrackElement lifeTimeTrackElement;
-
-    @JsonField
-    @Nullable
-    public StartSpeedLifeElement startSpeedLifeElement;
 
 
 }

@@ -1,16 +1,13 @@
 package com.til.particle_system.element.main;
 
 import com.til.json_read_write.annotation.BaseClass;
+import com.til.json_read_write.annotation.DefaultNew;
 import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
 import com.til.json_read_write.JsonTransform;
 import com.til.math.ITime;
 import com.til.math.IValue;
-import com.til.math.Quaternion;
-import com.til.math.V3;
 import com.til.particle_system.element.IElement;
-import com.til.particle_system.element.cell.ParticleCell;
-import com.til.particle_system.element.cell.ParticleSystemCell;
 
 /**
  * 用于储存粒子系统的主要元素
@@ -19,6 +16,7 @@ import com.til.particle_system.element.cell.ParticleSystemCell;
  */
 @BaseClass(sonClass = MainElement.class)
 @SonClass()
+@DefaultNew(newExample = MainElement.class)
 public class MainElement implements IElement {
     /***
      * int 粒子系统的生命周期

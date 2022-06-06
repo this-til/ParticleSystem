@@ -46,14 +46,14 @@ public class V3 {
     }
 
     public V3(Vec3 vec3) {
-        this(vec3.x, vec3.y, 0);
+        this(vec3.x, vec3.y, vec3.z);
     }
 
     public V3(Quaternion quaternion) {
-        double w = quaternion.w;
-        double x = quaternion.x;
-        double y = quaternion.y;
-        double z = quaternion.z;
+        double w = quaternion.i;
+        double x = quaternion.j;
+        double y = quaternion.k;
+        double z = quaternion.r;
         double sinrCosp = 2 * (w * x + y * z);
         double cosrCosp = 1 - 2 * (x * x + y * y);
         this.z = (float) Math.atan2(sinrCosp, cosrCosp);
@@ -125,6 +125,12 @@ public class V3 {
         return x == 0 && y == 0 && z == 0;
     }
 
+    public V3 transform(Quaternion quaternion) {
+        Quaternion q1 = quaternion.multiply(new Quaternion(this.x, this.y, this.z, 0));
+        q1 = q1.multiply(quaternion.inverse());
+        return new V3(quaternion.i, quaternion.j, quaternion.k);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -153,4 +159,9 @@ public class V3 {
     public String toString() {
         return "(" + this.x + ", " + this.y + ", " + this.z + ")";
     }
+
+    public static V3 lerp(V3 v3, V3 oldV3, double time) {
+        return v3.add(v3.reduce(oldV3).multiply(time));
+    }
+
 }

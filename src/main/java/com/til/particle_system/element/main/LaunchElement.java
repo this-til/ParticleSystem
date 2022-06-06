@@ -1,6 +1,7 @@
 package com.til.particle_system.element.main;
 
 import com.til.json_read_write.annotation.BaseClass;
+import com.til.json_read_write.annotation.DefaultNew;
 import com.til.json_read_write.annotation.JsonField;
 import com.til.json_read_write.annotation.SonClass;
 import com.til.json_read_write.JsonTransform;
@@ -16,6 +17,7 @@ import com.til.particle_system.element.IElement;
  */
 @BaseClass(sonClass = LaunchElement.class)
 @SonClass()
+@DefaultNew(newExample = LaunchElement.class)
 public class LaunchElement implements IElement {
 
     /***
@@ -76,6 +78,7 @@ public class LaunchElement implements IElement {
 
         @BaseClass(sonClass = LaunchBurstList.class)
         @SonClass(transform = JsonTransform.ListCurrencyJsonTransform.class)
+        @DefaultNew(newExample = LaunchBurstList.class)
         public static class LaunchBurstList extends List<LaunchBurst> {
         }
 

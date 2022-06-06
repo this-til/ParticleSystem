@@ -1,7 +1,9 @@
-package com.til.particle_system.element.cell;
+package com.til.particle_system.client.cell;
 
 
+import com.til.json_read_write.annotation.JsonField;
 import com.til.math.V2;
+import com.til.particle_system.element.control.StartSpeedLifeElement;
 import com.til.particle_system.element.main.LaunchElement;
 import com.til.util.Extension;
 import com.til.util.List;
@@ -10,6 +12,9 @@ import com.til.math.V3;
 import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.ParticleSystem;
 import com.til.util.Map;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
@@ -17,6 +22,7 @@ import java.util.Random;
  * 一个粒子系统的元素
  * @author til
  */
+@OnlyIn(Dist.CLIENT)
 public class ParticleSystemCell {
 
     /***
@@ -145,11 +151,17 @@ public class ParticleSystemCell {
         {
             if (particleSystem.mainElement.worldCoordinate.equals(MainElement.ParticleCoordinate.WORLD)) {
                 if (!move.isEmpty()) {
-                    particleCells.forEach(cell -> cell.pos.reduce(move));
+                    particleCells.forEach(cell -> {
+                        cell.pos = cell.pos.reduce(move);
+                        cell.oldPos = cell.pos;
+                    });
                 }
                 Quaternion quaternion = iParticleSystemSupport.getRotate().multiply(iParticleSystemSupport.getOldRotate().inverse());
                 if (!quaternion.isEmpty()) {
-                    particleCells.forEach(cell -> cell.rotate.multiply(quaternion));
+                    particleCells.forEach(cell -> {
+                        cell.rotate = cell.rotate.multiply(quaternion);
+                        cell.oldRotate = cell.rotate;
+                    });
                 }
             }
         }

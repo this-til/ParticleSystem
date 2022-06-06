@@ -15,26 +15,26 @@ import com.til.json_read_write.annotation.SonClass;
 @DefaultNew(newExample = Quaternion.class)
 public class Quaternion {
     @JsonField
-    public final double w;
+    public final double i;
     @JsonField
-    public final double x;
+    public final double j;
     @JsonField
-    public final double y;
+    public final double k;
     @JsonField
-    public final double z;
+    public final double r;
 
     public Quaternion() {
-        this.w = 1;
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
+        this.i = 1;
+        this.j = 0;
+        this.k = 0;
+        this.r = 0;
     }
 
-    public Quaternion(double w, double x, double y, double z) {
-        this.w = w;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Quaternion(double i, double j, double k, double r) {
+        this.i = i;
+        this.j = j;
+        this.k = k;
+        this.r = r;
     }
 
     public Quaternion(V3 v3) {
@@ -47,29 +47,33 @@ public class Quaternion {
         double sp = Math.sin(pitch * 0.5f);
         double cr = Math.cos(roll * 0.5f);
         double sr = Math.sin(roll * 0.5f);
-        w = cy * cp * cr + sy * sp * sr;
-        x = cy * cp * sr - sy * sp * cr;
-        y = sy * cp * sr + cy * sp * cr;
-        z = sy * cp * cr - cy * sp * sr;
+        i = cy * cp * cr + sy * sp * sr;
+        j = cy * cp * sr - sy * sp * cr;
+        k = sy * cp * sr + cy * sp * cr;
+        r = sy * cp * cr - cy * sp * sr;
     }
 
     public Quaternion multiply(Quaternion quaternion) {
-        double w = this.w * quaternion.w - this.x * quaternion.x - this.y * quaternion.y - this.z * quaternion.z;
-        double x = this.w * quaternion.x + this.x * quaternion.w + this.y * quaternion.z - this.z * quaternion.y;
-        double y = this.w * quaternion.y + this.y * quaternion.w + this.z * quaternion.x - this.x * quaternion.z;
-        double z = this.w * quaternion.z + this.z * quaternion.w + this.x * quaternion.y - this.y * quaternion.x;
-        return new Quaternion(w, x, y, z);
+        double i = this.i * quaternion.i - this.j * quaternion.j - this.k * quaternion.k - this.r * quaternion.r;
+        double j = this.i * quaternion.j + this.j * quaternion.i + this.k * quaternion.r - this.r * quaternion.k;
+        double k = this.i * quaternion.k + this.k * quaternion.i + this.r * quaternion.j - this.j * quaternion.r;
+        double r = this.i * quaternion.r + this.r * quaternion.i + this.j * quaternion.k - this.k * quaternion.j;
+        return new Quaternion(i, j, k, r);
+    }
+
+    public Quaternion multiply(double d) {
+        return new Quaternion(i, j * d, k * d, r * d);
     }
 
     /***
      * 求逆
      */
     public Quaternion inverse() {
-        return new Quaternion(w, -x, -y, -z);
+        return multiply(-1);
     }
 
     public boolean isEmpty() {
-        return w == 1 && x == 0 && y == 0 && z == 0;
+        return i == 1 && j == 0 && k == 0 && r == 0;
     }
 
     @Override
@@ -77,19 +81,22 @@ public class Quaternion {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof Quaternion) {
-            Quaternion v3 = (Quaternion) obj;
-            return Double.compare(v3.w, this.w) == 0
-                    && Double.compare(v3.x, this.x) == 0
-                    && Double.compare(v3.y, this.y) == 0
-                    && Double.compare(v3.z, this.z) == 0;
+        if (obj instanceof Quaternion v3) {
+            return Double.compare(v3.i, this.i) == 0
+                    && Double.compare(v3.j, this.j) == 0
+                    && Double.compare(v3.k, this.k) == 0
+                    && Double.compare(v3.r, this.r) == 0;
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return "(" + this.w + ", " + this.x + ", " + this.y + ", " + this.z + ")";
+        return "(" + this.i + ", " + this.j + ", " + this.k + ", " + this.r + ")";
+    }
+
+    public static Quaternion lerp(Quaternion quaternion, Quaternion oldQuaternion, double time) {
+        return quaternion.multiply(quaternion.multiply(oldQuaternion.inverse()).multiply(time));
     }
 
 }

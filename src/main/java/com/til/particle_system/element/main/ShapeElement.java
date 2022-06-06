@@ -1,11 +1,12 @@
 package com.til.particle_system.element.main;
 
 import com.til.json_read_write.annotation.BaseClass;
+import com.til.json_read_write.annotation.DefaultNew;
 import com.til.json_read_write.annotation.SonClass;
 import com.til.math.Quaternion;
 import com.til.math.V3;
 import com.til.particle_system.element.IElement;
-import com.til.particle_system.element.cell.ParticleCell;
+import com.til.particle_system.client.cell.ParticleCell;
 
 /**
  * 粒子系统的发射形状
@@ -13,6 +14,7 @@ import com.til.particle_system.element.cell.ParticleCell;
  * @author til
  */
 @BaseClass(sonClass = {ShapeElement.EmptyShapeElement.class})
+@DefaultNew(newExample = ShapeElement.EmptyShapeElement.class)
 public abstract class ShapeElement implements IElement {
 
     /***

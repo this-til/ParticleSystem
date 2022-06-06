@@ -1,13 +1,16 @@
-package com.til.particle_system.element.cell;
+package com.til.particle_system.client.cell;
 
 import com.til.math.Quaternion;
 import com.til.math.V3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /***
  * 对粒子系统的支持
  * @author til
  */
 
+@OnlyIn(Dist.CLIENT)
 public interface IParticleSystemSupport {
 
     /***
@@ -26,8 +29,18 @@ public interface IParticleSystemSupport {
     Quaternion getRotate();
 
     /***
-     * 返回上一t粒子系统的旋转
+     * 获取粒子系统上t旋转
      */
     Quaternion getOldRotate();
+
+    /***
+     * 获取粒子系统的大小
+     */
+    V3 getSize();
+
+    /***
+     * 获取粒子系统上一t大小
+     */
+    V3 getOldSize();
 
 }

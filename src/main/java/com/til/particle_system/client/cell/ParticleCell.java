@@ -1,9 +1,10 @@
-package com.til.particle_system.element.cell;
+package com.til.particle_system.client.cell;
 
 import com.til.math.Colour;
 import com.til.math.Quaternion;
 import com.til.math.V2;
 import com.til.math.V3;
+import com.til.particle_system.element.control.StartSpeedLifeElement;
 import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeSpeedColourElement;
@@ -17,15 +18,15 @@ import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedEle
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedExtendElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedLimitElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedResistanceElement;
-import com.til.util.Util;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import org.lwjgl.opengl.AMDVertexShaderTessellator;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /***
  * 粒子
  * @author til
  */
+@OnlyIn(Dist.CLIENT)
 public class ParticleCell {
     /***
      * 粒子系统
@@ -116,20 +117,27 @@ public class ParticleCell {
      */
     public Quaternion oldRotate;
 
-
     public ParticleCell(ParticleSystemCell particleSystemCell, double time) {
         this.particleSystemCell = particleSystemCell;
         this.structureTime = time;
         MainElement mainElement = particleSystemCell.particleSystem.mainElement;
         this.startSize = mainElement.particleSize.as(time);
-        //this.startSpeed = mainElement.particleSpeed.as(time).doubleValue();
         this.startColour = mainElement.particleColour.as(time);
-        this.maxLife = mainElement.particleLife.as(time).intValue();
+
         this.gravity = mainElement.particleGravity.as(time).doubleValue();
         this.rotate = particleSystemCell.particleSystem.shapeElement.getStartRotate(this);
         this.startMove = particleSystemCell.particleSystem.shapeElement.getStartMove(this);
         this.pos = particleSystemCell.particleSystem.shapeElement.getStartPos(this);
         this.rotate = new Quaternion(mainElement.particleRotate.as(time));
+        {
+            StartSpeedLifeElement element = particleSystemCell.particleSystem.startSpeedLifeElement;
+            int maxLife = mainElement.particleLife.as(time).intValue();
+            if (element != null) {
+                this.maxLife = maxLife * element.multiplyLife.as(element.speedRange.getProportion(move.magnitude())).intValue();
+            } else {
+                this.maxLife = maxLife;
+            }
+        }
         writeStart();
         writeOld();
         {
