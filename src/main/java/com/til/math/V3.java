@@ -102,6 +102,11 @@ public class V3 {
         return new V3(x - v3.x, y - v3.y, z - v3.z);
     }
 
+    public V3 reduce(Vec3 vec3) {
+        return new V3(x - vec3.x, y - vec3.y, z - vec3.z);
+    }
+
+
     /***
      * 模的平方
      */
@@ -130,7 +135,7 @@ public class V3 {
     public V3 transform(Quaternion quaternion) {
         Quaternion q1 = quaternion.multiply(new Quaternion(this.x, this.y, this.z, 0));
         q1 = q1.multiply(quaternion.inverse());
-        return new V3(quaternion.i, quaternion.j, quaternion.k);
+        return new V3(q1.i, q1.j, q1.k);
     }
 
     @Override
@@ -165,5 +170,4 @@ public class V3 {
     public static V3 lerp(V3 v3, V3 oldV3, double time) {
         return v3.add(v3.reduce(oldV3).multiply(time));
     }
-
 }

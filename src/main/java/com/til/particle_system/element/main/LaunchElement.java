@@ -63,6 +63,7 @@ public class LaunchElement implements IElement {
         /***
          * 间隔时间
          */
+        @JsonField
         public ITime.ITimeNumber intervalTime;
 
         /***

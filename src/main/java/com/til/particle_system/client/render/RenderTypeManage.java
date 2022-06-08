@@ -1,5 +1,7 @@
 package com.til.particle_system.client.render;
 
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.Tesselator;
 import com.til.math.Colour;
 import com.til.math.Quaternion;
 import com.til.math.UV;
@@ -13,12 +15,17 @@ import com.til.particle_system.element.main.RenderElement;
 import com.til.util.List;
 import com.til.util.Map;
 import com.til.util.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(modid = MainParticleSystem.MOD_ID, value = Dist.CLIENT)
 public class RenderTypeManage {
 
     public static final Map<Class<?>, IRenderType<?>> MAP = new Map<>();
@@ -34,7 +41,7 @@ public class RenderTypeManage {
 
     public static final IRenderType<RenderElement.TextureRender> TEXTURE_RENDER_I_RENDER_TYPE = (render, particleCell, vertexConsumer, camera, time) -> {
         ParticleSystemCell particleSystemCell = particleCell.particleSystemCell;
-        V3 particlePos = particleSystemCell.renderPos.add(V3.lerp(particleCell.pos, particleCell.oldPos, time));
+        V3 particlePos = particleSystemCell.renderPos.add(V3.lerp(particleCell.pos, particleCell.oldPos, time)).reduce(camera.getPosition());
         Quaternion particleQuaternion = particleSystemCell.renderRotate.multiply(particleCell.rotate);
         V3 particleSize = particleSystemCell.renderSize.multiply(particleCell.size);
         Colour colour = particleCell.colour;
@@ -65,72 +72,83 @@ public class RenderTypeManage {
     public static final String textString =
             """
                     {
-                      "mainElement": {
-                        "loop": false,
-                        "delay": 0,
-                        "particleLife": 100,
-                        "particleSpeed": 0,
-                        "particleSize": {
-                          "type": "no_separation",
-                          "value": 10
-                        },
-                        "particleRotate": {
-                          "x": 0,
-                          "y": 0,
-                          "z": 0
-                        },
-                        "particleColour": {
-                          "r": 1,
-                          "g": 1,
-                          "b": 1,
-                          "a": 1
-                        },
-                        "particleGravity": 0,
-                        "worldCoordinate": "WORLD",
-                        "ParticleBufferMode": "IGNORE",
-                        "maxParticle": 5
-                      },
-                      "launchElement": {
-                        "timeGenerate": 0,
-                        "moveGenerate": 0,
-                        "launchBursts": [
-                          {
-                            "needTime": 0,
-                            "cycle": 1,
-                            "amount": 1,
-                            "intervalTime": 1,
-                            "probability": 1
+                          "mainElement": {
+                            "maxLife": 100,
+                            "loop": false,
+                            "delay": 0,
+                            "particleLife": 100,
+                            "particleSpeed": 0,
+                            "particleSize": {
+                              "type": "no_separation",
+                              "value": 10
+                            },
+                            "particleRotate": {
+                              "x": 0,
+                              "y": 0,
+                              "z": 0
+                            },
+                            "particleColour": {
+                              "r": 1,
+                              "g": 1,
+                              "b": 1,
+                              "a": 1
+                            },
+                            "particleGravity": 0,
+                            "worldCoordinate": "WORLD",
+                            "bufferMode": "IGNORE",
+                            "maxParticle": 5
+                          },
+                          "launchElement": {
+                            "timeGenerate": 0,
+                            "moveGenerate": 0,
+                            "launchBursts": [
+                              {
+                                "needTime": 0,
+                                "cycle": 1,
+                                "amount": 1,
+                                "intervalTime": 1,
+                                "probability": 1
+                              }
+                            ]
+                          },
+                          "shapeElement": {
+                            "type": "empty"
+                          },
+                          "renderElement": {
+                            "type": "render",
+                            "texture": "particle_system:textures/particle/small.png",
+                            "timeUV": [
+                              {
+                                "time": 1,
+                                "uv": {
+                                   "u0": 1,
+                                   "u1": 0,
+                                   "v0": 1,
+                                   "v1": 0
+                                }
+                              }
+                            ]
                           }
-                        ]
-                      },
-                      "shapeElement": {
-                        "type": "empty"
-                      },
-                      "renderElement": {
-                        "type": "render",
-                        "texture": "particle_system:textures/particle/small.png",
-                        "timeUV": [
-                          {
-                            "time": 1,
-                            "uv": {
-                              "u0": 0,
-                              "u1": 1,
-                              "v0": 0,
-                              "v1": 1
-                            }
-                          }
-                        ]
-                      }
-                    }
+                        }
                     """;
 
     public static ParticleSystem textParticleSystem;
 
-/*    @SubscribeEvent
-    public static void onEvent(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving().level.isClientSide) {
-            Minecraft.getInstance().particleEngine.add(new ParticleSystemCarrier((ClientLevel) event.getEntityLiving().level,
-                    textParticleSystem, new V3(event.getEntity().position()), new Quaternion(), new V3(1, 1, 1)));
+    public static final ParticleRenderType NO_RENDER = new ParticleRenderType() {
+        @Override
+        public void begin(@NotNull BufferBuilder p_107436_, @NotNull TextureManager p_107437_) {
+
         }
-    }*/
+
+        @Override
+        public void end(@NotNull Tesselator p_107438_) {
+
+        }
+
+        @Override
+        public String toString() {
+            return MainParticleSystem.MOD_ID + ":" + "no_render";
+        }
+    };
+
 }

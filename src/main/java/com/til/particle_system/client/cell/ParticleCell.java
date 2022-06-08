@@ -147,6 +147,11 @@ public class ParticleCell extends Particle {
      */
     public Quaternion oldRotate;
 
+    /***
+     * 表示粒子选定范围
+     */
+    public AABB aabb;
+
     public ParticleCell(ParticleSystemCell particleSystemCell) {
         super(particleSystemCell.iParticleSystemSupport.getClient(), 0, 0, 0);
         this.particleSystemCell = particleSystemCell;
@@ -172,6 +177,7 @@ public class ParticleCell extends Particle {
         }
         writeStart();
         writeOld();
+        refreshAABB();
         {
             LifeTimeSpeedExtendElement element = particleSystemCell.particleSystem.lifeTimeSpeedExtendElement;
             if (element != null && element.extendType.equals(LifeTimeSpeedExtendElement.ExtendType.START)) {
@@ -335,8 +341,10 @@ public class ParticleCell extends Particle {
                 }
             }
         }
-        MultiBufferSource multiBufferSource;
-        pos = pos.add(startMove);
+        if (!startMove.isEmpty()) {
+            pos = pos.add(startMove);
+            refreshAABB();
+        }
     }
 
     public void writeOld() {
@@ -350,6 +358,14 @@ public class ParticleCell extends Particle {
         size = startSize;
         move = startMove;
         colour = startColour;
+    }
+
+    public void refreshAABB() {
+        V3 mPos = particleSystemCell.iParticleSystemSupport.getPos().add(pos);
+        V3 mSize = particleSystemCell.iParticleSystemSupport.getSize().multiply(size);
+        V3 max = mPos.add(mSize);
+        V3 min = mPos.reduce(mSize);
+        aabb = new AABB(max.x, max.y, max.z, min.x, min.y, min.z);
     }
 
     @Override
@@ -429,7 +445,7 @@ public class ParticleCell extends Particle {
 
     @Override
     public @NotNull AABB getBoundingBox() {
-        return INITIAL_AABB;
+        return aabb;
     }
 
     @Override

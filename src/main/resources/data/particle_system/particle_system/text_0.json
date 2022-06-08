@@ -1,5 +1,6 @@
 {
   "mainElement": {
+    "maxLife": 100,
     "loop": false,
     "delay": 0,
     "particleLife": 100,
@@ -21,7 +22,7 @@
     },
     "particleGravity": 0,
     "worldCoordinate": "WORLD",
-    "ParticleBufferMode": "IGNORE",
+    "bufferMode": "IGNORE",
     "maxParticle": 5
   },
   "launchElement": {
@@ -47,10 +48,10 @@
       {
         "time": 1,
         "uv": {
-          "u0": 0,
-          "u1": 1,
-          "v0": 0,
-          "v1": 1
+          "u0": 1,
+          "u1": 0,
+          "v0": 1,
+          "v1": 0
         }
       }
     ]

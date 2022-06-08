@@ -3,6 +3,7 @@ package com.til.particle_system.client.cell;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.til.math.V2;
+import com.til.particle_system.client.render.RenderTypeManage;
 import com.til.particle_system.element.main.LaunchElement;
 import com.til.util.Extension;
 import com.til.util.List;
@@ -103,6 +104,11 @@ public class ParticleSystemCell extends Particle {
      */
     public V3 renderSize;
 
+    /***
+     * 粒子范围
+     */
+    public AABB aabb;
+
     public ParticleSystemCell(ParticleSystem particleSystem, IParticleSystemSupport iParticleSystemSupport) {
         super(iParticleSystemSupport.getClient(), 0, 0, 0);
         this.particleSystem = particleSystem;
@@ -113,6 +119,10 @@ public class ParticleSystemCell extends Particle {
         particleSystem.launchElement.launchBursts.forEach(e -> launchBurstMap.put(e, new Extension.Data2<>(e.needTime.intValue(), e.cycle.intValue())));
         maxLife = particleSystem.mainElement.maxLife;
         isLoop = particleSystem.mainElement.loop;
+        renderPos = new V3();
+        renderRotate = new Quaternion();
+        renderSize = new V3();
+        refreshAABB();
     }
 
 
@@ -147,12 +157,12 @@ public class ParticleSystemCell extends Particle {
                 launch();
             }
             launchBurstMap.forEach((k, v) -> {
-                if (v.d2 < 0) {
+                if (v.d2 <= 0) {
                     return;
                 }
                 v.d1--;
                 if (v.d1 <= 0) {
-                    v.d2++;
+                    v.d2--;
                     v.d1 = k.intervalTime.as(time).intValue();
                     if (rand.nextDouble() < k.probability.as().doubleValue()) {
                         int a = k.amount.as(time).intValue();
@@ -185,6 +195,10 @@ public class ParticleSystemCell extends Particle {
                 }
             }
         }
+        //刷新aabb
+        {
+            refreshAABB();
+        }
     }
 
 
@@ -213,6 +227,14 @@ public class ParticleSystemCell extends Particle {
         for (ParticleCell particleCell : particleCells) {
             particleCell.isDeath = true;
         }
+    }
+
+    public void refreshAABB() {
+        V3 mPos = iParticleSystemSupport.getPos();
+        V3 mSize = iParticleSystemSupport.getSize();
+        V3 max = mPos.add(mSize);
+        V3 min = mPos.reduce(mSize);
+        aabb = new AABB(max.x, max.y, max.z, min.x, min.y, min.z);
     }
 
     @Override
@@ -295,7 +317,7 @@ public class ParticleSystemCell extends Particle {
 
     @Override
     public @NotNull AABB getBoundingBox() {
-        return ParticleCell.INITIAL_AABB;
+        return aabb;
     }
 
     @Override
@@ -311,15 +333,13 @@ public class ParticleSystemCell extends Particle {
 
     @Override
     public void render(@NotNull VertexConsumer vertexConsumer, @NotNull Camera camera, float time) {
-        V3 cameraPos = new V3(camera.getPosition());
-        V3 particleSystemPos = V3.lerp(iParticleSystemSupport.getPos(), iParticleSystemSupport.getOldPos(), time);
-        renderPos = particleSystemPos.reduce(cameraPos);
+        renderPos = V3.lerp(iParticleSystemSupport.getPos(), iParticleSystemSupport.getOldPos(), time);
         renderRotate = Quaternion.lerp(iParticleSystemSupport.getRotate(), iParticleSystemSupport.getOldRotate(), time);
         renderSize = V3.lerp(iParticleSystemSupport.getSize(), iParticleSystemSupport.getOldSize(), time);
     }
 
     @Override
     public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.NO_RENDER;
+        return RenderTypeManage.NO_RENDER;
     }
 }

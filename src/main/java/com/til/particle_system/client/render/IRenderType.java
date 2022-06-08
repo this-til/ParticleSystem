@@ -2,6 +2,7 @@ package com.til.particle_system.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.til.particle_system.MainParticleSystem;
 import com.til.particle_system.client.cell.ParticleCell;
 import com.til.particle_system.client.cell.ParticleSystemCell;
 import com.til.particle_system.element.main.RenderElement;
@@ -48,11 +49,18 @@ public interface IRenderType<E extends RenderElement> {
 
                 @Override
                 public void end(@NotNull Tesselator tesselator) {
+                    tesselator.end();
                     @SuppressWarnings("deprecation") AbstractTexture tex = Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_PARTICLES);
                     tex.restoreLastBlurMipmap();
                     RenderSystem.disableBlend();
                     RenderSystem.depthMask(true);
                 }
+
+                @Override
+                public String toString() {
+                    return resourceLocation.toString();
+                }
+
             };
             PARTICLE_RENDER_OF_TEXTURE.put(resourceLocation, particleRenderType);
             return particleRenderType;
@@ -71,9 +79,15 @@ public interface IRenderType<E extends RenderElement> {
         }
 
         @Override
-        public void end(@NotNull Tesselator p_107438_) {
+        public void end(@NotNull Tesselator tesselator) {
+            tesselator.end();
             RenderSystem.disableBlend();
             RenderSystem.depthMask(true);
+        }
+
+        @Override
+        public String toString() {
+            return MainParticleSystem.MOD_ID + ":" + "null_texture";
         }
     };
 }
