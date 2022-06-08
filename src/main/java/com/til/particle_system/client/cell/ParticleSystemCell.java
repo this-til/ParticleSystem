@@ -1,9 +1,8 @@
 package com.til.particle_system.client.cell;
 
 
-import com.til.json_read_write.annotation.JsonField;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.til.math.V2;
-import com.til.particle_system.element.control.StartSpeedLifeElement;
 import com.til.particle_system.element.main.LaunchElement;
 import com.til.util.Extension;
 import com.til.util.List;
@@ -12,10 +11,17 @@ import com.til.math.V3;
 import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.ParticleSystem;
 import com.til.util.Map;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.core.particles.ParticleGroup;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
 import java.util.Random;
 
 /***
@@ -23,7 +29,7 @@ import java.util.Random;
  * @author til
  */
 @OnlyIn(Dist.CLIENT)
-public class ParticleSystemCell {
+public class ParticleSystemCell extends Particle {
 
     /***
      * 粒子系统模板
@@ -82,7 +88,23 @@ public class ParticleSystemCell {
      */
     public double launchParticleAmount;
 
+    /***
+     * 渲染位置
+     */
+    public V3 renderPos;
+
+    /***
+     * 渲染旋转
+     */
+    public Quaternion renderRotate;
+
+    /***
+     * 渲染大小
+     */
+    public V3 renderSize;
+
     public ParticleSystemCell(ParticleSystem particleSystem, IParticleSystemSupport iParticleSystemSupport) {
+        super(iParticleSystemSupport.getClient(), 0, 0, 0);
         this.particleSystem = particleSystem;
         this.iParticleSystemSupport = iParticleSystemSupport;
         maxParticle = particleSystem.mainElement.maxParticle;
@@ -97,7 +119,8 @@ public class ParticleSystemCell {
     /***
      * 毎t刷新
      */
-    public void up() {
+    @Override
+    public void tick() {
         V3 move = iParticleSystemSupport.getPos().reduce(iParticleSystemSupport.getOldPos());
         {
             time = V2.getProportionStatic(0, maxLife, life);
@@ -142,10 +165,7 @@ public class ParticleSystemCell {
         }
         // 粒子的刷新
         {
-            particleCells.remove(e -> {
-                e.up();
-                return e.isDeath;
-            });
+            particleCells.remove(e -> e.isDeath);
         }
         //系统的移动
         {
@@ -173,7 +193,9 @@ public class ParticleSystemCell {
      */
     public void launch() {
         if (particleCells.size() <= maxParticle) {
-            particleCells.add(new ParticleCell(this, time));
+            ParticleCell particleCell = new ParticleCell(this);
+            Minecraft.getInstance().particleEngine.add(particleCell);
+            particleCells.add(particleCell);
         } else {
             if (particleSystem.mainElement.bufferMode == MainElement.ParticleBufferMode.KILL) {
                 particleCells.remove(particleCells.get(0));
@@ -188,6 +210,116 @@ public class ParticleSystemCell {
      */
     public void setDeath() {
         isDeath = true;
+        for (ParticleCell particleCell : particleCells) {
+            particleCell.isDeath = true;
+        }
     }
 
+    @Override
+    public void remove() {
+        setDeath();
+    }
+
+    @Override
+    public boolean isAlive() {
+        return !isDeath;
+    }
+
+    @Override
+    @Deprecated
+    public @NotNull Particle setPower(float p_107269_) {
+        return this;
+    }
+
+    @Override
+    @Deprecated
+    protected void setAlpha(float p_107272_) {
+    }
+
+    @Override
+    @Deprecated
+    public void setParticleSpeed(double p_172261_, double p_172262_, double p_172263_) {
+    }
+
+    @Override
+    @Deprecated
+    public void setLifetime(int p_107258_) {
+    }
+
+    @Override
+    @Deprecated
+    public void setColor(float p_107254_, float p_107255_, float p_107256_) {
+    }
+
+    @Override
+    @Deprecated
+    protected void setSize(float p_107251_, float p_107252_) {
+    }
+
+    @Override
+    @Deprecated
+    public void setPos(double p_107265_, double p_107266_, double p_107267_) {
+    }
+
+    @Override
+    @Deprecated
+    protected void setLocationFromBoundingbox() {
+    }
+
+    @Override
+    @Deprecated
+    public void setBoundingBox(@NotNull AABB p_107260_) {
+    }
+
+    @Override
+    @Deprecated
+    public int getLifetime() {
+        return 0;
+    }
+
+    @Override
+    public @NotNull Optional<ParticleGroup> getParticleGroup() {
+        return Optional.empty();
+    }
+
+    @Override
+    @Deprecated
+    protected int getLightColor(float p_107249_) {
+        return 0;
+    }
+
+    @Override
+    @Deprecated
+    public void move(double p_107246_, double p_107247_, double p_107248_) {
+    }
+
+    @Override
+    public @NotNull AABB getBoundingBox() {
+        return ParticleCell.INITIAL_AABB;
+    }
+
+    @Override
+    @Deprecated
+    public @NotNull Particle scale(float p_107270_) {
+        return this;
+    }
+
+    @Override
+    public boolean shouldCull() {
+        return true;
+    }
+
+    @Override
+    public void render(@NotNull VertexConsumer vertexConsumer, @NotNull Camera camera, float time) {
+        V3 cameraPos = new V3(camera.getPosition());
+        V3 particleSystemPos = V3.lerp(iParticleSystemSupport.getPos(), iParticleSystemSupport.getOldPos(), time);
+        renderPos = particleSystemPos.reduce(cameraPos);
+        renderRotate = Quaternion.lerp(iParticleSystemSupport.getRotate(), iParticleSystemSupport.getOldRotate(), time);
+        renderSize = V3.lerp(iParticleSystemSupport.getSize(), iParticleSystemSupport.getOldSize(), time);
+    }
+
+    @Override
+    public @NotNull ParticleRenderType getRenderType() {
+        return ParticleRenderType.NO_RENDER;
+    }
 }

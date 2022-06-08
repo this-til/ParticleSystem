@@ -17,6 +17,6 @@ public class JsonFunction implements Function<FriendlyByteBuf, JsonElement> {
             chars[i] = friendlyByteBuf.readChar();
         }
         String s = String.valueOf(chars);
-        return MainParticleSystem.main.gson.toJsonTree(s);
+        return MainParticleSystem.main.jsonAnalysis.gson.toJsonTree(s);
     }
 }

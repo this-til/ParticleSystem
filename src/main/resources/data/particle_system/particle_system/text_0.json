@@ -5,7 +5,7 @@
     "particleLife": 100,
     "particleSpeed": 0,
     "particleSize": {
-      "type":"no_separation",
+      "type": "no_separation",
       "value": 10
     },
     "particleRotate": {
@@ -39,5 +39,20 @@
   },
   "shapeElement": {
     "type": "empty"
+  },
+  "renderElement": {
+    "type": "render",
+    "texture": "particle_system:textures/particle/small.png",
+    "timeUV": [
+      {
+        "time": 1,
+        "uv": {
+          "u0": 0,
+          "u1": 1,
+          "v0": 0,
+          "v1": 1
+        }
+      }
+    ]
   }
 }

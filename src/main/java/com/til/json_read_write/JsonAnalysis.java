@@ -1,16 +1,22 @@
 package com.til.json_read_write;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.SonClass;
 import com.til.json_read_write.annotation.UsePrefab;
+import com.til.particle_system.MainParticleSystem;
+import com.til.particle_system.element.ParticleSystem;
 import com.til.util.Util;
 import com.til.util.Map;
 import com.til.util.UseString;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraftforge.common.MinecraftForge;
+
+import java.text.MessageFormat;
 
 /***
  * @author til
@@ -20,9 +26,11 @@ public class JsonAnalysis {
     public final Map<Class<?>, JsonTransform<?>> JSON_ANALYSIS_MAP_MAP = new Map<>();
     public final Map<Class<?>, ReadIO.JsonReloadListenerCell<?>> USE_PREFAB_MAP = new Map<>();
     public final ReadIO readIO;
+    public final Gson gson;
 
     public JsonAnalysis() {
         init(this);
+        gson = new Gson();
         readIO = new ReadIO(this);
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -33,8 +41,13 @@ public class JsonAnalysis {
             if (JSON_ANALYSIS_MAP_MAP.containsKey(target)) {
                 return Util.forcedConversion(JSON_ANALYSIS_MAP_MAP.get(target));
             } else {
-                JsonTransform<E> transform = Util.forcedConversion(sonClass.transform().getDeclaredConstructor(Class.class, SonClass.class, JsonAnalysis.class).newInstance(target, sonClass, this));
-                JSON_ANALYSIS_MAP_MAP.put(target, transform);
+                JsonTransform<E> transform = null;
+                try {
+                    transform = Util.forcedConversion(sonClass.transform().getDeclaredConstructor(Class.class, SonClass.class, JsonAnalysis.class).newInstance(target, sonClass, this));
+                    JSON_ANALYSIS_MAP_MAP.put(target, transform);
+                } catch (Exception exception) {
+                    MainParticleSystem.main.logger.error(MessageFormat.format("在创建类型为[{0}]的解析器时出现错误。", target));
+                }
                 return transform;
             }
         }
@@ -90,6 +103,15 @@ public class JsonAnalysis {
         return sonCell.as(UseString.DEFAULT, jsonElement);
     }
 
+    public <E> E as(Class<E> particleSystemClass, String textString) throws Exception {
+        JsonElement jsonElement = GsonHelper.fromJson(this.gson, textString, JsonElement.class);
+        if (jsonElement != null) {
+            return as(particleSystemClass, jsonElement);
+        }
+        return null;
+    }
+
+
     /***
      * 序列化
      * @param baseType 父类型
@@ -137,14 +159,22 @@ public class JsonAnalysis {
          * 反序列化
          */
         public E as(Class<E> type, JsonElement jsonElement) throws Exception {
-            return jsonTransformMap.get(type).as(jsonElement);
+            if (jsonTransformMap.containsKey(type)) {
+                return jsonTransformMap.get(type).as(jsonElement);
+            } else {
+                throw new NullPointerException(MessageFormat.format("没有类型为[{0}]的解析器\n当前元素解析器有[{1}]", type, jsonTransformMap));
+            }
         }
 
         /***
          * 反序列化
          */
         public E as(String type, JsonElement jsonElement) throws Exception {
-            return as(classMap.get(type), jsonElement);
+            if (classMap.containsKey(type)) {
+                return as(classMap.get(type), jsonElement);
+            } else {
+                throw new NullPointerException(MessageFormat.format("没有名为[{0}]的解析器类型\n当前元素拥有解析器类型为[{1}]", type, classMap));
+            }
         }
 
         /***

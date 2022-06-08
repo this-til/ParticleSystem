@@ -62,7 +62,7 @@ public class ReadIO {
         public final Class<E> type;
 
         public JsonReloadListenerCell(ReadIO readIO, Class<E> type, String p, JsonAnalysis jsonAnalysis) {
-            super(MainParticleSystem.main.gson, p);
+            super(MainParticleSystem.main.jsonAnalysis.gson, p);
             this.type = type;
             this.readIO = readIO;
             this.map = new Map<>();

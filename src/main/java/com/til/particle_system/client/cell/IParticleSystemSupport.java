@@ -2,6 +2,7 @@ package com.til.particle_system.client.cell;
 
 import com.til.math.Quaternion;
 import com.til.math.V3;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -42,5 +43,8 @@ public interface IParticleSystemSupport {
      * 获取粒子系统上一t大小
      */
     V3 getOldSize();
+
+    ClientLevel getClient();
+
 
 }

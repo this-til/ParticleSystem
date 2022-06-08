@@ -1,9 +1,16 @@
 package com.til.particle_system.client.cell;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.til.math.Colour;
 import com.til.math.Quaternion;
 import com.til.math.V2;
 import com.til.math.V3;
+import com.til.particle_system.client.render.IRenderType;
+import com.til.particle_system.client.render.RenderTypeManage;
 import com.til.particle_system.element.control.StartSpeedLifeElement;
 import com.til.particle_system.element.main.MainElement;
 import com.til.particle_system.element.particle_life_time.colour.LifeTimeColourElement;
@@ -18,20 +25,43 @@ import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedEle
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedExtendElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedLimitElement;
 import com.til.particle_system.element.particle_life_time.speed.LifeTimeSpeedResistanceElement;
+import com.til.util.Util;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.core.particles.ParticleGroup;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL11;
+
+import java.util.Optional;
 
 /***
  * 粒子
  * @author til
  */
 @OnlyIn(Dist.CLIENT)
-public class ParticleCell {
+public class ParticleCell extends Particle {
     /***
      * 粒子系统
      */
     public final ParticleSystemCell particleSystemCell;
+
+    /***
+     * 如何渲染粒子
+     */
+    public final IRenderType<?> iRenderType;
+
     /***
      * 粒子在被创建时主粒子发射器的时间进度
      */
@@ -117,21 +147,23 @@ public class ParticleCell {
      */
     public Quaternion oldRotate;
 
-    public ParticleCell(ParticleSystemCell particleSystemCell, double time) {
+    public ParticleCell(ParticleSystemCell particleSystemCell) {
+        super(particleSystemCell.iParticleSystemSupport.getClient(), 0, 0, 0);
         this.particleSystemCell = particleSystemCell;
-        this.structureTime = time;
+        this.time = particleSystemCell.time;
+        this.structureTime = particleSystemCell.time;
         MainElement mainElement = particleSystemCell.particleSystem.mainElement;
-        this.startSize = mainElement.particleSize.as(time);
-        this.startColour = mainElement.particleColour.as(time);
-
-        this.gravity = mainElement.particleGravity.as(time).doubleValue();
+        this.startSize = mainElement.particleSize.as(structureTime);
+        this.startColour = mainElement.particleColour.as(structureTime);
+        this.gravity = mainElement.particleGravity.as(structureTime).doubleValue();
         this.rotate = particleSystemCell.particleSystem.shapeElement.getStartRotate(this);
         this.startMove = particleSystemCell.particleSystem.shapeElement.getStartMove(this);
         this.pos = particleSystemCell.particleSystem.shapeElement.getStartPos(this);
-        this.rotate = new Quaternion(mainElement.particleRotate.as(time));
+        this.rotate = new Quaternion(mainElement.particleRotate.as(structureTime));
+        this.iRenderType = RenderTypeManage.get(particleSystemCell.particleSystem.renderElement.getClass());
         {
             StartSpeedLifeElement element = particleSystemCell.particleSystem.startSpeedLifeElement;
-            int maxLife = mainElement.particleLife.as(time).intValue();
+            int maxLife = mainElement.particleLife.as(structureTime).intValue();
             if (element != null) {
                 this.maxLife = maxLife * element.multiplyLife.as(element.speedRange.getProportion(move.magnitude())).intValue();
             } else {
@@ -151,7 +183,8 @@ public class ParticleCell {
         }
     }
 
-    public void up() {
+    @Override
+    public void tick() {
         life++;
         if (life >= maxLife) {
             isDeath = true;
@@ -318,5 +351,112 @@ public class ParticleCell {
         move = startMove;
         colour = startColour;
     }
+
+    @Override
+    @Deprecated
+    public boolean isAlive() {
+        return !isDeath;
+    }
+
+    @Override
+    @Deprecated
+    public @NotNull Particle setPower(float p_107269_) {
+        return this;
+    }
+
+    @Override
+    @Deprecated
+    public void setColor(float r, float b, float g) {
+    }
+
+    @Override
+    @Deprecated
+    protected void setAlpha(float a) {
+    }
+
+    @Override
+    @Deprecated
+    public void setParticleSpeed(double p_172261_, double p_172262_, double p_172263_) {
+    }
+
+    @Override
+    @Deprecated
+    public void setLifetime(int p_107258_) {
+    }
+
+    @Override
+    public @NotNull Particle scale(float p_107683_) {
+        return this;
+    }
+
+    @Override
+    @Deprecated
+    protected int getLightColor(float p_107249_) {
+        return 0;
+    }
+
+    @Override
+    @Deprecated
+    protected void setSize(float p_107251_, float p_107252_) {
+    }
+
+    @Override
+    @Deprecated
+    public void setPos(double p_107265_, double p_107266_, double p_107267_) {
+    }
+
+    @Override
+    public void remove() {
+        this.isDeath = true;
+    }
+
+    @Override
+    public boolean shouldCull() {
+        return true;
+    }
+
+    @Override
+    @Deprecated
+    protected void setLocationFromBoundingbox() {
+    }
+
+    @Override
+    @Deprecated
+    public void setBoundingBox(@NotNull AABB p_107260_) {
+    }
+
+    public static final AABB INITIAL_AABB = new AABB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+
+    @Override
+    public @NotNull AABB getBoundingBox() {
+        return INITIAL_AABB;
+    }
+
+    @Override
+    public @NotNull Optional<ParticleGroup> getParticleGroup() {
+        return Optional.empty();
+    }
+
+    @Override
+    public void move(double p_107246_, double p_107247_, double p_107248_) {
+        super.move(p_107246_, p_107247_, p_107248_);
+    }
+
+    @Override
+    public int getLifetime() {
+        return maxLife;
+    }
+
+    @Override
+    public @NotNull ParticleRenderType getRenderType() {
+        return iRenderType.getRenderType(Util.forcedConversion(particleSystemCell.particleSystem.renderElement));
+    }
+
+    @Override
+    public void render(@NotNull VertexConsumer vertexConsumer, @NotNull Camera camera, float time) {
+        iRenderType.render((Util.forcedConversion(particleSystemCell.particleSystem.renderElement)),
+                this, vertexConsumer, camera, time);
+    }
+
 
 }

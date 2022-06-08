@@ -2,6 +2,7 @@ package com.til.math;
 
 import com.til.json_read_write.annotation.*;
 import com.til.util.UseString;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 /***
@@ -68,6 +69,7 @@ public class V3 {
         this.y = (float) Math.atan2(sinyCosp, cosyCosp);
 
     }
+
 
     public V3 multiply(double d) {
         return new V3(x * d, y * d, z * d);

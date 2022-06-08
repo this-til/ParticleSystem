@@ -8,6 +8,7 @@ import com.til.channel_io.JsonFunction;
 import com.til.channel_io.JsonRun;
 import com.til.json_read_write.JsonAnalysis;
 import com.til.math.*;
+import com.til.particle_system.client.render.RenderTypeManage;
 import com.til.particle_system.element.ParticleSystem;
 import com.til.util.UseString;
 import com.til.util.Util;
@@ -15,6 +16,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,13 +41,11 @@ public class MainParticleSystem {
 
     public final Logger logger;
     public final JsonAnalysis jsonAnalysis;
-    public final Gson gson;
     public final String protocolVersion = "1";
     public final SimpleChannel channel;
 
     public MainParticleSystem() {
         main = this;
-        this.gson = new Gson();
         this.logger = LogUtils.getLogger();
         this.jsonAnalysis = new JsonAnalysis();
         {
@@ -62,7 +63,7 @@ public class MainParticleSystem {
                 jsonAnalysis.get(ITime.ITimeV3.class);
                 jsonAnalysis.get(ITime.ITimeColour.class);
             } catch (Exception e) {
-               logger.error("", e);
+                logger.error("", e);
             }
 
         }
@@ -91,6 +92,12 @@ public class MainParticleSystem {
         {
             jsonAnalysis.readIO.add(MOD_ID, ParticleSystem.class);
         }
+
+        try {
+            RenderTypeManage.textParticleSystem = jsonAnalysis.as(ParticleSystem.class, RenderTypeManage.textString);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event) {
@@ -110,5 +117,9 @@ public class MainParticleSystem {
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
         }
+    }
+
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class Test {
     }
 }

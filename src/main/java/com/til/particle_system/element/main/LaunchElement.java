@@ -1,5 +1,6 @@
 package com.til.particle_system.element.main;
 
+import com.til.json_read_write.JsonAnalysis;
 import com.til.json_read_write.annotation.BaseClass;
 import com.til.json_read_write.annotation.DefaultNew;
 import com.til.json_read_write.annotation.JsonField;
@@ -77,9 +78,22 @@ public class LaunchElement implements IElement {
         public IValue.IValueNumber probability;
 
         @BaseClass(sonClass = LaunchBurstList.class)
-        @SonClass(transform = JsonTransform.ListCurrencyJsonTransform.class)
+        @SonClass(transform = LaunchBurstList.LaunchBurstListJsonTransform.class)
         @DefaultNew(newExample = LaunchBurstList.class)
         public static class LaunchBurstList extends List<LaunchBurst> {
+
+            public static class LaunchBurstListJsonTransform extends JsonTransform.ListCurrencyJsonTransform<LaunchBurst, LaunchBurstList> {
+
+                public LaunchBurstListJsonTransform(Class<LaunchBurstList> type, SonClass sonClass, JsonAnalysis jsonAnalysis) throws Exception {
+                    super(type, sonClass, jsonAnalysis);
+                }
+
+                @Override
+                public Class<LaunchBurst> getElementType() {
+                    return LaunchBurst.class;
+                }
+            }
+
         }
 
     }
