@@ -1,5 +1,6 @@
 package com.til.math;
 
+import com.mojang.math.Vector3f;
 import com.til.json_read_write.annotation.*;
 import com.til.util.UseString;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,6 +15,15 @@ import net.minecraft.world.phys.Vec3;
 @DefaultNew(newExample = V3.class)
 @UsePrefab(route = {UseString.PREFAB, "v3"})
 public class V3 {
+
+    public static final V3 XN = new V3(-1.0F, 0.0F, 0.0F);
+    public static final V3 XP = new V3(1.0F, 0.0F, 0.0F);
+    public static final V3 YN = new V3(0.0F, -1.0F, 0.0F);
+    public static final V3 YP = new V3(0.0F, 1.0F, 0.0F);
+    public static final V3 ZN = new V3(0.0F, 0.0F, -1.0F);
+    public static final V3 ZP = new V3(0.0F, 0.0F, 1.0F);
+    public static final V3 ZERO = new V3(0.0F, 0.0F, 0.0F);
+
     /***
      * pitch
      */
@@ -138,13 +148,16 @@ public class V3 {
         return new V3(q1.i, q1.j, q1.k);
     }
 
+    public Quaternion rotation(double z) {
+        return new Quaternion(this, z, false);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof V3) {
-            V3 v3 = (V3) obj;
+        if (obj instanceof V3 v3) {
             return Double.compare(v3.x, this.x) == 0
                     && Double.compare(v3.y, this.y) == 0
                     && Double.compare(v3.z, this.z) == 0;

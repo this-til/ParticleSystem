@@ -53,6 +53,21 @@ public class Quaternion {
         r = sy * cp * cr - cy * sp * sr;
     }
 
+    public Quaternion(com.mojang.math.Quaternion rotation) {
+        this(rotation.i(), rotation.j(), rotation.k(), rotation.r());
+    }
+
+    public Quaternion(V3 v3, double d, boolean b) {
+        if (b) {
+            d *= Math.PI / 180F;
+        }
+        double f = Math.sin(d / 2.0F);
+        this.i = v3.x * f;
+        this.j = v3.y * f;
+        this.k = v3.z * f;
+        this.r = Math.cos(d / 2.0F);
+    }
+
     public Quaternion multiply(Quaternion quaternion) {
         double i = this.i * quaternion.i - this.j * quaternion.j - this.k * quaternion.k - this.r * quaternion.r;
         double j = this.i * quaternion.j + this.j * quaternion.i + this.k * quaternion.r - this.r * quaternion.k;

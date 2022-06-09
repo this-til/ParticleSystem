@@ -51,7 +51,7 @@ import java.util.Optional;
  * @author til
  */
 @OnlyIn(Dist.CLIENT)
-public class ParticleCell extends Particle {
+public class ParticleCell extends Particle implements IParticleSystemSupport {
     /***
      * 粒子系统
      */
@@ -146,6 +146,21 @@ public class ParticleCell extends Particle {
      * 上t粒子的旋转
      */
     public Quaternion oldRotate;
+
+    /***
+     * 渲染位置
+     */
+    public V3 renderPos;
+
+    /***
+     * 渲染旋转
+     */
+    public Quaternion renderRotate;
+
+    /***
+     * 渲染大小
+     */
+    public V3 renderSize;
 
     /***
      * 表示粒子选定范围
@@ -369,6 +384,58 @@ public class ParticleCell extends Particle {
     }
 
     @Override
+    public V3 getPos() {
+        IParticleSystemSupport support = particleSystemCell.iParticleSystemSupport;
+        return support.getPos().add(pos.multiply(support.getSize()).transform(support.getRotate()));
+    }
+
+    @Override
+    public V3 getOldPos() {
+        IParticleSystemSupport support = particleSystemCell.iParticleSystemSupport;
+        return support.getOldPos().add(oldPos.multiply(support.getSize()).transform(support.getOldRotate()));
+    }
+
+    @Override
+    public Quaternion getRotate() {
+        return particleSystemCell.iParticleSystemSupport.getRotate().multiply(rotate);
+    }
+
+    @Override
+    public Quaternion getOldRotate() {
+        return particleSystemCell.iParticleSystemSupport.getOldRotate().multiply(oldRotate);
+    }
+
+    @Override
+    public V3 getSize() {
+        return particleSystemCell.iParticleSystemSupport.getSize().multiply(size);
+    }
+
+    @Override
+    public V3 getOldSize() {
+        return particleSystemCell.iParticleSystemSupport.getOldSize().multiply(oldSize);
+    }
+
+    @Override
+    public V3 getRenderPos(float time) {
+        return renderPos;
+    }
+
+    @Override
+    public Quaternion getRenderRotate(float time) {
+        return renderRotate;
+    }
+
+    @Override
+    public V3 getRenderSize(float time) {
+        return renderSize;
+    }
+
+    @Override
+    public ClientLevel getClient() {
+        return particleSystemCell.iParticleSystemSupport.getClient();
+    }
+
+    @Override
     @Deprecated
     public boolean isAlive() {
         return !isDeath;
@@ -441,8 +508,6 @@ public class ParticleCell extends Particle {
     public void setBoundingBox(@NotNull AABB p_107260_) {
     }
 
-    public static final AABB INITIAL_AABB = new AABB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
-
     @Override
     public @NotNull AABB getBoundingBox() {
         return aabb;
@@ -470,6 +535,9 @@ public class ParticleCell extends Particle {
 
     @Override
     public void render(@NotNull VertexConsumer vertexConsumer, @NotNull Camera camera, float time) {
+        renderPos = particleSystemCell.renderPos.add(V3.lerp(pos, oldPos, time).multiply(particleSystemCell.renderSize).transform(particleSystemCell.renderRotate));
+        renderSize = particleSystemCell.renderSize.multiply(V3.lerp(size, oldSize, time));
+        renderRotate = particleSystemCell.renderRotate.multiply(Quaternion.lerp(rotate, oldRotate, time));
         iRenderType.render((Util.forcedConversion(particleSystemCell.particleSystem.renderElement)),
                 this, vertexConsumer, camera, time);
     }

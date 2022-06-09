@@ -17,7 +17,7 @@ import java.util.Comparator;
  * 粒子的渲染
  * @author til
  */
-@BaseClass(sonClass = {RenderElement.EmptyRenderElement.class, RenderElement.TextureRender.class})
+@BaseClass(sonClass = {RenderElement.EmptyRenderElement.class, RenderElement.TextureRender.class, RenderElement.TextureOnlyZRotate.class})
 @DefaultNew(newExample = RenderElement.EmptyRenderElement.class)
 public abstract class RenderElement {
 
@@ -78,46 +78,92 @@ public abstract class RenderElement {
             return new ResourceLocation(texture);
         }
 
-        @BaseClass(sonClass = UVCell.class)
-        @SonClass()
-        public static class UVCell {
 
-            @JsonField
-            public UV uv;
+    }
 
-            @JsonField
-            public double time;
+    /***
+     * 仅仅选择z轴
+     */
+    @SonClass(name = TextureOnlyZRotate.NAME)
+    @NeedInit(initMethod = "init")
+    public static class TextureOnlyZRotate extends RenderElement {
+        public static final String NAME = "render_only_z";
+
+        @JsonField
+        public String texture;
+
+        @JsonField
+        public UVCell.UVCellList timeUV;
+
+        public void init() throws Exception {
+            if (timeUV.isEmpty()) {
+                throw new Exception((MessageFormat.format("初始化验证[{0}]数据时，timeUV没有元素", this)));
+            }
+            timeUV = new UVCell.UVCellList(timeUV.stream().sorted(Comparator.comparing(e -> e.time)).toList());
+            if (timeUV.get(timeUV.size() - 1).time != 1) {
+                throw new Exception((MessageFormat.format("初始化验证[{0}]数据时，timeUV[{1}]尾元素时间值不等于1", this, timeUV)));
+            }
+        }
 
 
-            @BaseClass(sonClass = UVCellList.class)
-            @SonClass(transform = UVCellList.UVListJsonTransform.class)
-            @DefaultNew(newExample = UVCellList.class)
-            public static class UVCellList extends List<UVCell> {
+        /***
+         * 获取UV
+         * @param time 时间0~1
+         * @return 当前时间的UV
+         */
+        public UV getUV(double time) {
+            for (UVCell uvCell : timeUV) {
+                if (uvCell.time >= time) {
+                    return uvCell.uv;
+                }
+            }
+            return null;
+        }
 
-                public UVCellList() {
-                    super();
+        @Override
+        public @Nullable ResourceLocation getTexture() {
+            return new ResourceLocation(texture);
+        }
+
+    }
+
+    @BaseClass(sonClass = UVCell.class)
+    @SonClass()
+    public static class UVCell {
+
+        @JsonField
+        public UV uv;
+
+        @JsonField
+        public double time;
+
+
+        @BaseClass(sonClass = UVCellList.class)
+        @SonClass(transform = UVCellList.UVListJsonTransform.class)
+        @DefaultNew(newExample = UVCellList.class)
+        public static class UVCellList extends List<UVCell> {
+
+            public UVCellList() {
+                super();
+            }
+
+            public UVCellList(Iterable<? extends UVCell> i) {
+                super(i);
+            }
+
+            public static class UVListJsonTransform extends JsonTransform.ListCurrencyJsonTransform<UVCell, UVCellList> {
+
+                public UVListJsonTransform(Class<UVCellList> type, SonClass sonClass, JsonAnalysis jsonAnalysis) throws Exception {
+                    super(type, sonClass, jsonAnalysis);
                 }
 
-                public UVCellList(Iterable<? extends UVCell> i) {
-                    super(i);
+                @Override
+                public Class<UVCell> getElementType() {
+                    return UVCell.class;
                 }
-
-                public static class UVListJsonTransform extends JsonTransform.ListCurrencyJsonTransform<UVCell, UVCellList> {
-
-                    public UVListJsonTransform(Class<UVCellList> type, SonClass sonClass, JsonAnalysis jsonAnalysis) throws Exception {
-                        super(type, sonClass, jsonAnalysis);
-                    }
-
-                    @Override
-                    public Class<UVCell> getElementType() {
-                        return UVCell.class;
-                    }
-                }
-
             }
 
         }
-
 
     }
 

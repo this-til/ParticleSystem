@@ -72,6 +72,11 @@ public class ClientManage {
                 }
 
                 @Override
+                public V3 getRenderPos(float time) {
+                    return V3.lerp(getPos(), getOldPos(), time);
+                }
+
+                @Override
                 public Quaternion getRotate() {
                     return new Quaternion();
                 }
@@ -82,6 +87,11 @@ public class ClientManage {
                 }
 
                 @Override
+                public Quaternion getRenderRotate(float time) {
+                    return Quaternion.lerp(getRotate(), getOldRotate(), time);
+                }
+
+                @Override
                 public V3 getSize() {
                     return new V3(1, 1, 1);
                 }
@@ -89,6 +99,11 @@ public class ClientManage {
                 @Override
                 public V3 getOldSize() {
                     return new V3(1, 1, 1);
+                }
+
+                @Override
+                public V3 getRenderSize(float time) {
+                    return V3.lerp(getSize(), getOldSize(), time);
                 }
 
                 @Override

@@ -333,9 +333,9 @@ public class ParticleSystemCell extends Particle {
 
     @Override
     public void render(@NotNull VertexConsumer vertexConsumer, @NotNull Camera camera, float time) {
-        renderPos = V3.lerp(iParticleSystemSupport.getPos(), iParticleSystemSupport.getOldPos(), time);
-        renderRotate = Quaternion.lerp(iParticleSystemSupport.getRotate(), iParticleSystemSupport.getOldRotate(), time);
-        renderSize = V3.lerp(iParticleSystemSupport.getSize(), iParticleSystemSupport.getOldSize(), time);
+        renderPos = iParticleSystemSupport.getRenderPos(time);
+        renderRotate = iParticleSystemSupport.getRenderRotate(time);
+        renderSize = iParticleSystemSupport.getRenderSize(time);
     }
 
     @Override

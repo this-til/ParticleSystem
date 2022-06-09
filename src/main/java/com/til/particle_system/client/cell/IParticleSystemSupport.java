@@ -25,6 +25,11 @@ public interface IParticleSystemSupport {
     V3 getOldPos();
 
     /***
+     * 获取渲染时的位置
+     */
+    V3 getRenderPos(float time);
+
+    /***
      * 返回粒子系统的旋转
      */
     Quaternion getRotate();
@@ -35,6 +40,11 @@ public interface IParticleSystemSupport {
     Quaternion getOldRotate();
 
     /***
+     * 获取渲染时的旋转
+     */
+    Quaternion getRenderRotate(float time);
+
+    /***
      * 获取粒子系统的大小
      */
     V3 getSize();
@@ -43,6 +53,11 @@ public interface IParticleSystemSupport {
      * 获取粒子系统上一t大小
      */
     V3 getOldSize();
+
+    /***
+     * 获取渲染时的大小
+     */
+    V3 getRenderSize(float time);
 
     ClientLevel getClient();
 
